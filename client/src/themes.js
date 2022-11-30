@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-import {Box, IconButton, useMediaQuery} from "@mui/material";
+import {Box, IconButton} from "@mui/material";
 import {DarkModeOutlined, LightModeOutlined} from "@mui/icons-material";
 
 
@@ -15,6 +15,9 @@ const lightTheme = createTheme( {
                 },
                 secondary: {
                     main: '#3f51b5',
+                },
+                error: {
+                    main: 'rgb(255,0,0)'
                 },
             }
         }
@@ -31,6 +34,9 @@ const darkTheme = createTheme({
             secondary: {
                 main: '#ffd26e',
             },
+            error: {
+                main: 'rgb(255,0,0)'
+            },
             text: {
                 primary: '#f9f9f9',
                 secondary: 'rgba(255,255,253,0.7)',
@@ -40,6 +46,7 @@ const darkTheme = createTheme({
 );
 
 export function ToggleTheme(props) {
+    // inspired by code from https://mui.com/material-ui/customization/dark-mode/#ToggleColorMode.js
     const [currMode, setMode] = React.useState("dark");
     const colorMode = React.useMemo(
         () => ({
@@ -68,7 +75,7 @@ export function ToggleTheme(props) {
     );
 }
 
-export function ToggleThemeButton() {
+function ToggleThemeButton() {
     const theme = useTheme();
     const colorMode = React.useContext(ColorModeContext);
     return (
