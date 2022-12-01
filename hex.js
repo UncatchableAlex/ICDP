@@ -1,21 +1,28 @@
 class Hex {
-    constructor(x, y, resource, number) {
-        this.x = x;
-        this.y = y;
-        this.robber = false;
+    static COLORS = {
+        g: "GoldenRod",
+        w: "Olive",
+        o: "DimGrey",
+        l: "ForestGreen",
+        b: "SaddleBrown",
+        d: "SandyBrown",
+    }
+
+    constructor(resource, number) {
+        this.robber = resource === "d" ? true : false;
         this.number = number;
         this.resource = resource;
         this.vertices = new Array(6);
-        this.sides = new Array(6);
+        this.edges = new Array(6);
     }
 
-    highlight() {
-        ctx.fillStyle = "yellow"
-        drawHex(this.x,this.y,tileSize);
-    }
-
-    unhighlight(){
-        ctx.fillStyle = "red"
-        drawHex(this.x,this.y,tileSize);
+    draw() {
+        ctx.fillStyle = Hex.COLORS[this.resource];
+        ctx.beginPath();
+        for (let v of this.vertices) {
+            ctx.lineTo(v.x, v.y);
+        }
+        ctx.closePath();
+        ctx.fill();
     }
 }

@@ -10,9 +10,17 @@
     <div>
         <canvas id="canvas" width="500" height="500"></canvas>
     </div>
+    <script>
+        function dragstart_handler(event){
+            event.dataTransfer.setData("text/plain",event.target.id);
+        }
+    </script>
+    <p id="settie" draggable="true" ondragstart="dragstart_handler(event)">settie</p>
+    <p id="road" draggable="true" ondragstart="dragstart_handler(event)">road</p>
+    <p id="city" draggable="true" ondragstart="dragstart_handler(event)">city</p>
     <script src="utils.js"></script>
     <script src="hex.js"></script>
-    <script src="side.js"></script>
+    <script src="edge.js"></script>
     <script src="vertex.js"></script>
     <script src="board.js"></script>
     <script src="app.js"></script>
