@@ -11,3 +11,12 @@ function pixelToHex(x, y, size = tileSize) {
         r: 0.6666666666666666 * y / size
     };
 }
+
+function shuffleArray(arr, times = 1) {
+    for (let j = 0; j < times; j++){
+        for (let i = 0; i < arr.length; i++) {
+            let rnd = i + Math.floor(Math.random() * (arr.length - i));
+            [arr[i], arr[rnd]] = [arr[rnd], arr[i]];
+        }
+    }
+}

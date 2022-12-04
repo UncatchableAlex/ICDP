@@ -12,10 +12,7 @@ class Board {
 
     static get_rand_tile_seq() {
         let res = ['b', 'b', 'b', 'd', 'g', 'g', 'g', 'g', 'l', 'l', 'l', 'l', 'o', 'o', 'o', 'w', 'w', 'w', 'w'];
-        for (let i = 0; i < res.length; i++) {
-            let rnd = i + Math.floor(Math.random() * (res.length - i));
-            [res[i], res[rnd]] = [res[rnd], res[i]];
-        }
+        shuffleArray(res, 3);
         return res;
     }
 
@@ -44,9 +41,11 @@ class Board {
             let q = coord[0];
             let r = coord[1];
 
-            let num = resources[index] != "d" ? 0 : numbers.pop();
+            let num = resources[index] === "d" ? 0 : numbers.pop();
             this.tiles[q] = this.tiles[q] || {};
-            this.tiles[q][r] = new Hex(resources[index], num);
+
+            let pos = hexToPixel(q,r);
+            this.tiles[q][r] = new Hex(pos.x + this.offsetX, pos.y + this.offsetY, resources[index], num);
             for (let k = 0; k < 6; k++) {
                 // initialize and link vertices with hexes
                 let id = {
@@ -148,7 +147,8 @@ class Board {
     }
 
     draw_board() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "DeepSkyBlue"
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let type of ["tiles", "edges", "vertices"]) {
             for (let i in this[type]) {
                 for (let j in this[type][i]) {

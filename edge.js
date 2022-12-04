@@ -14,6 +14,7 @@ class Edge {
             ctx.lineTo(this.vertices[1].x,this.vertices[1].y);
             ctx.closePath();
             ctx.stroke();
+            ctx.lineWidth = 1;
         }
     }
 }
