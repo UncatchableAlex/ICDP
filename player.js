@@ -5,11 +5,11 @@ class Player {
     this.victoryPoints = victoryPoint;
 
     this.resources = {
-      ore: 10,
-      wheat: 10,
-      sheep: 10,
-      wood: 10,
-      brick: 10,
+      ore: 0,
+      wheat: 0,
+      sheep: 0,
+      wood: 0,
+      brick: 0,
     };
     this.developmentCards = {
       knight: 0,

@@ -40,4 +40,4 @@ function upgradeSettlement(player, bank) {
   return false;
 }
 
-// Define functions for trades
+// Define functions for trades (need server to do so)
