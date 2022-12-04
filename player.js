@@ -1,20 +1,20 @@
 class Player {
-  constructor(playerID) {
+  constructor(playerID, playerName, victoryPoint = 0) {
     this.playerID = playerID;
-    this.victoryPoints;
+    this.playerName = playerName;
+    this.victoryPoints = victoryPoint;
 
     this.resources = {
-      ore: 0,
-      wheat: 0,
-      sheep: 0,
-      wood: 0,
-      brick: 0,
+      ore: 10,
+      wheat: 10,
+      sheep: 10,
+      wood: 10,
+      brick: 10,
     };
     this.developmentCards = {
       knight: 0,
       roadBuilding: 0,
       yearOfPlenty: 0,
-
       monopoly: 0,
       victoryPoint: 0,
     };
@@ -24,37 +24,147 @@ class Player {
       roadBuilding: 0,
       yearOfPlenty: 0,
       monopoly: 0,
-      victoryPoint: 0,
     };
 
-    function canBuildRoad() {
-      return this.wood >= 1 && this.brick >= 1;
-    }
+    this.buildings = {
+      roads: 15,
+      settlements: 5,
+      cities: 4,
+    };
+  }
 
-    function canBuildSettlement() {
-      return (
-        this.wood >= 1 && this.brick >= 1 && this.wheat >= 1 && this.sheep >= 1
-      );
-    }
+  getVPS() {
+    return this.victoryPoints + this.developmentCards.victoryPoint;
+  }
 
-    function canUpgradeSettlement() {
-      return this.wheat >= 2 && this.ore >= 2;
-    }
+  canBuildRoad() {
+    return (
+      this.resources.wood >= 1 &&
+      this.resources.brick >= 1 &&
+      this.buildings.roads > 0
+    );
+  }
 
-    function canPanPlayKnight() {
-      return this.knight >= 1;
+  buildRoad() {
+    if (this.canBuildRoad()) {
+      this.resources.wood--;
+      this.resources.brick--;
+      this.buildings.roads--;
+      return true;
     }
+    return false;
+  }
 
-    function canPlayRoadBuilding() {
-      return this.roadBuilding >= 1;
-    }
+  canBuildSettlement() {
+    return (
+      this.resources.wood >= 1 &&
+      this.resources.brick >= 1 &&
+      this.resources.wheat >= 1 &&
+      this.resources.sheep >= 1 &&
+      this.buildings.settlements > 0
+    );
+  }
 
-    function canPlayYearOfPlenty() {
-      return this.roadBuilding >= 1;
+  buildSettlement() {
+    if (this.canBuildSettlement()) {
+      this.resources.wood--;
+      this.resources.brick--;
+      this.resources.wheat--;
+      this.resources.sheep--;
+      this.resources.settlements--;
+      return true;
     }
+    return false;
+  }
 
-    function canPlayMonopoly() {
-      return this.monopoly >= 1;
+  canUpgradeSettlement() {
+    return (
+      this.resources.wheat >= 2 &&
+      this.resources.ore >= 2 &&
+      this.buildings.cities > 0
+    );
+  }
+
+  upgradeSettlement() {
+    if (this.canUpgradeSettlement()) {
+      this.resources.wheat -= 2;
+      this.resources.ore -= 3;
+      this.buildings.cities--;
+      this.buildings.settlements++;
+      return true;
     }
+    return false;
+  }
+
+  canBuyDevelopmentCard() {
+    return (
+      this.resources.wheat >= 1 &&
+      this.resources.sheep >= 1 &&
+      this.resources.ore >= 1
+    );
+  }
+
+  buyDevelopmentCard() {
+    if (this.canBuyDevelopmentCard()) {
+      this.resources.wheat--;
+      this.resources.sheep--;
+      this.resources.ore--;
+    }
+  }
+
+  canPlayKnight() {
+    return this.developmentCards.knight >= 1;
+  }
+
+  playKnight() {
+    if (this.canPlayKnight()) {
+      this.developmentCards.knight--;
+      this.developmentCardsPlayed.knight++;
+      return true;
+    }
+    return false;
+  }
+
+  canPlayRoadBuilding() {
+    return this.developmentCards.roadBuilding >= 1;
+  }
+
+  playRoadBuilding() {
+    if (this.canPlayRoadBuilding()) {
+      this.developmentCards.roadBuilding--;
+      this.developmentCardsPlayed.roadBuilding++;
+      return true;
+    }
+    return false;
+  }
+
+  canPlayYearOfPlenty() {
+    return this.developmentCards.roadBuilding >= 1;
+  }
+
+  playYearOfPlenty() {
+    if (this.canPlayYearOfPlenty()) {
+      this.developmentCards.yearOfPlenty--;
+      this.developmentCardsPlayed.yearOfPlenty++;
+      return true;
+    }
+    return false;
+  }
+
+  canPlayMonopoly() {
+    return this.developmentCards.monopoly >= 1;
+  }
+
+  playMonopoly() {
+    if (this.canPlayMonopoly()) {
+      this.developmentCards.monopoly--;
+      this.developmentCardsPlayed.monopoly++;
+      return true;
+    }
+    return false;
+  }
+
+  receiveDevelopmentCard(developmentCard) {
+    this.developmentCards[developmentCard]++;
   }
 }
