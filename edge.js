@@ -7,7 +7,7 @@ class Edge {
 
     draw() {
         if (this.playerId !== undefined) {
-            ctx.strokeStyle = playerColors[this.playerId];
+            ctx.strokeStyle = Player.COLORS[this.playerId];
             ctx.lineWidth = tileSize * 0.1;
             ctx.beginPath();
             ctx.lineTo(this.vertices[0].x,this.vertices[0].y);

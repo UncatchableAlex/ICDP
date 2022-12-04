@@ -1,17 +1,17 @@
 class Hex {
     static COLORS = {
-        g: "GoldenRod",
-        w: "Olive",
-        o: "DimGrey",
-        l: "ForestGreen",
-        b: "SaddleBrown",
-        d: "SandyBrown",
+        wheat: "GoldenRod",
+        sheep: "Olive",
+        ore: "DimGrey",
+        wood: "ForestGreen",
+        brick: "SaddleBrown",
+        desert: "SandyBrown",
     }
 
     constructor(x, y, resource, number) {
         this.x = x;
         this.y = y;
-        this.robber = resource === "d" ? true : false;
+        this.robber = resource === "desert" ? true : false;
         this.number = number;
         this.resource = resource;
         this.vertices = new Array(6);
@@ -40,8 +40,6 @@ class Hex {
             ctx.textAlign = "center"
             ctx.textBaseline = "middle"
             ctx.fillText(this.number, this.x, this.y);
-            ctx.strokeStyle = "black"
-            ctx.strokeText(this.number, this.x, this.y);
         }
     }
 }

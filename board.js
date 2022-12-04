@@ -11,7 +11,7 @@ class Board {
     ];
 
     static get_rand_tile_seq() {
-        let res = ['b', 'b', 'b', 'd', 'g', 'g', 'g', 'g', 'l', 'l', 'l', 'l', 'o', 'o', 'o', 'w', 'w', 'w', 'w'];
+        let res = ['brick', 'brick', 'brick', 'desert', 'wheat', 'wheat', 'wheat', 'wheat', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep'];
         shuffleArray(res, 3);
         return res;
     }
@@ -41,7 +41,7 @@ class Board {
             let q = coord[0];
             let r = coord[1];
 
-            let num = resources[index] === "d" ? 0 : numbers.pop();
+            let num = resources[index] === "desert" ? 0 : numbers.pop();
             this.tiles[q] = this.tiles[q] || {};
 
             let pos = hexToPixel(q,r);
@@ -100,7 +100,7 @@ class Board {
             for (let e of v.edges) {
                 if (e.vertices[0].structure !== undefined || e.vertices[1].structure !== undefined) return false;
             }
-            v.structure = "s";
+            v.structure = "settie";
             v.playerId = playerId;
             return true;
         }
@@ -112,8 +112,8 @@ class Board {
         pos.q = Math.round(pos.q * 3);
         pos.r = Math.round(pos.r * 3);
         let v = this.get("vertices", pos);
-        if (v && v.structure === "s" && v.playerId === playerId) {
-            v.structure = "c";
+        if (v && v.structure === "settie" && v.playerId === playerId) {
+            v.structure = "city";
             return true;
         }
         return false;

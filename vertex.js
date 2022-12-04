@@ -11,8 +11,8 @@ class Vertex {
 
     draw() {
         if (this.playerId !== undefined) {
-            ctx.fillStyle = playerColors[this.playerId];
-            if (this.structure === "s") {
+            ctx.fillStyle = Player.COLORS[this.playerId];
+            if (this.structure === "settie") {
                 let size = tileSize * 0.3;
                 let half = size / 2;
                 ctx.fillRect(this.x - half, this.y - half, size, size);
