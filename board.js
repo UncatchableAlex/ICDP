@@ -1,3 +1,8 @@
+const {Hex} = require("./hex.js");
+const {Utils} = require("./utils.js");
+const {Edge} = require("./edge.js");
+const {Vertex} = require("./vertex.js");
+
 class Board {
     static #TILE_COORDINATES = [
         [0, -2], [-1, -1], [-2, 0], [-2, 1], [-2, 2],
@@ -12,7 +17,7 @@ class Board {
 
     static get_rand_tile_seq() {
         let res = ['brick', 'brick', 'brick', 'desert', 'wheat', 'wheat', 'wheat', 'wheat', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep'];
-        shuffleArray(res, 3);
+        Utils.shuffleArray(res, 3);
         return res;
     }
 
@@ -22,8 +27,8 @@ class Board {
      * @param {string} resources 
      */
     constructor(resources = Board.get_rand_tile_seq()) {
-        this.offsetX = canvas.width / 2;
-        this.offsetY = canvas.height / 2;
+        this.offsetX = 600 / 2;
+        this.offsetY = 600 / 2;
         this.tiles = {};
         this.edges = {};
         this.vertices = {};
@@ -44,7 +49,7 @@ class Board {
             let num = resources[index] === "desert" ? 0 : numbers.pop();
             this.tiles[q] = this.tiles[q] || {};
 
-            let pos = hexToPixel(q,r);
+            let pos = Utils.hexToPixel(q,r);
             this.tiles[q][r] = new Hex(pos.x + this.offsetX, pos.y + this.offsetY, resources[index], num);
             for (let k = 0; k < 6; k++) {
                 // initialize and link vertices with hexes
@@ -146,7 +151,7 @@ class Board {
         return false
     }
 
-    draw_board() {
+    draw_board(canvas, ctx) {
         ctx.fillStyle = "DeepSkyBlue"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let type of ["tiles", "edges", "vertices"]) {
@@ -158,3 +163,5 @@ class Board {
         }
     }
 }
+
+exports.Board = Board;

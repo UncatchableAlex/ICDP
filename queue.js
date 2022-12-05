@@ -10,14 +10,14 @@ class Queue {
   }
 
   dequeue() {
-    if (!this.queue.isEmpty()) {
+    if (!this.isEmpty()) {
       return this.queue.shift();
     }
     return "empty";
   }
 
   dequeue4() {
-    if (this.queueLength() >= 4) {
+    if (this.getLength() >= 4) {
       return this.queue.shift(4);
     }
     return "too few in queue";
@@ -27,8 +27,8 @@ class Queue {
     return this.queue.length == 0;
   }
 
-  queueLength() {
-    return this.queue.length();
+  getLength() {
+    return this.queue.length;
   }
 
   printQueue() {
@@ -39,3 +39,5 @@ class Queue {
     str += "]";
   }
 }
+
+exports.Queue = Queue;

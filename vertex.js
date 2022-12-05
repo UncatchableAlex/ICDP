@@ -1,6 +1,8 @@
+const { Utils } = require("./utils.js")
+
 class Vertex {
     constructor(hex, offsetX, offsetY) {
-        let pix = hexToPixel(hex.q / 3, hex.r / 3);
+        let pix = Utils.hexToPixel(hex.q / 3, hex.r / 3);
         this.x = pix.x + offsetX;
         this.y = pix.y + offsetY;
         this.structure;
@@ -28,3 +30,4 @@ class Vertex {
         }
     }
 }
+exports.Vertex = Vertex;

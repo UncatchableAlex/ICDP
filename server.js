@@ -1,62 +1,43 @@
-const express = require("express");
+
+const { Board } = require("./board.js")
+const { Queue } = require("./queue.js")
+
+const express = require('express');
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 const port = 8099;
-const router = express.Router();
-
-let gameId = 0;
-let playerId = 0;
 
 
-let playerQueue = new Queue();
+const queue = new Queue();
 
-const gameIds = {};
+app.use(express.static(__dirname + "/"));
 
-function newGame() {
-  // 4 players from queue
-  let players;
-  let newGame = Game(gameId, board, players);
-  gameId++;
-
-  games.push(newGame);
-}
-
-function deleteGame(id) {
-  delete gameIds[id];
-}
-
-// Get code for the login page from Alex
-app.get("/home", async (req, res) => {
-  await new Promise();
-  console.log("Here");
-  res.send("Please login");
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
 
-app.get("/queue", (req, res) => {
-  res.send("Thank you for waiting in the queue");
-  console.log("In queue");
-});
+io.on('connection', (socket) => {
+  // enter queue
+  console.log("new user")
+  queue.enqueue(socket);
+  if (queue.getLength() >= 4) {
+    let roomId = "room1";
+    for (let i = 0; i < 4; i++) {
+      let s = queue.dequeue();
+      s.join(roomId)
+    }
+    let board = new Board();
+    io.to(roomId).emit("join game", board);
+  }
 
-router
-  .route("/games/:gameId")
-  .get((req, res) => {
-    res.send(`Get game board with gameId ${req.params.gameId}`);
-    console.log(req.player);
+  socket.on("turn update", (info) => {
+    io.to("room1").emit("turn update", info);
   })
-  .put((req, res) => {
-    res.send(`Update game board with gameId ${req.params.gameId}`);
-  })
-  .delete((req, res) => {
-    res.send(`Delete game board with gameId ${req.params.gameId}`);
-  });
-
-router.param("/game/:gameId", (req, res, next, gameId) => {
-  req.player = players[gameId];
-  next();
 });
 
-app.get("/queue", (req, res) => {
-  res.send("In Queue");
-  console.log("in Queue");
+server.listen(port, () => {
+  console.log(`listening on port ${port}`);
 });
-
-// app.listen(port);
