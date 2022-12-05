@@ -18,4 +18,3 @@ class Edge {
         }
     }
 }
-exports.Edge = Edge;

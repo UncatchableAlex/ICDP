@@ -38,7 +38,7 @@ class Bank {
     }
 
     // Shuffle the development cards
-    shuffleArray(this.developmentCards, this.developmentCards.length);
+    Utils.shuffleArray(this.developmentCards, this.developmentCards.length);
   }
 
   canSellDevelopmentCard() {

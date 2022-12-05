@@ -91,7 +91,7 @@ class Game {
   }
 
   playYearOfPlenty(player, resource1, resource2) {
-    if (player.canPlayYearOfPlenty) {
+    if (player.canPlayYearOfPlenty()) {
       player.resources[resource1]++;
       player.resources[resource2]++;
     }

@@ -1,8 +1,3 @@
-const {Hex} = require("./hex.js");
-const {Utils} = require("./utils.js");
-const {Edge} = require("./edge.js");
-const {Vertex} = require("./vertex.js");
-
 class Board {
     static #TILE_COORDINATES = [
         [0, -2], [-1, -1], [-2, 0], [-2, 1], [-2, 2],
@@ -163,5 +158,3 @@ class Board {
         }
     }
 }
-
-exports.Board = Board;

@@ -41,6 +41,5 @@ class Hex {
       ctx.textBaseline = "middle";
       ctx.fillText(this.number, this.x, this.y);
     }
+  }
 }
-
-exports.Hex = Hex;

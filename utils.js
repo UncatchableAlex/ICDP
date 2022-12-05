@@ -22,5 +22,3 @@ class Utils {
         }
     }
 }
-
-exports.Utils = Utils;

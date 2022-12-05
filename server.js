@@ -1,6 +1,6 @@
 
-const { Board } = require("./board.js")
-const { Queue } = require("./queue.js")
+const { Board } = require("./board.js");
+const { Queue } = require("./queue.js");
 
 const express = require('express');
 const app = express();

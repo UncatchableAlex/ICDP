@@ -1,5 +1,3 @@
-const { Utils } = require("./utils.js")
-
 class Vertex {
     constructor(hex, offsetX, offsetY) {
         let pix = Utils.hexToPixel(hex.q / 3, hex.r / 3);
@@ -30,4 +28,3 @@ class Vertex {
         }
     }
 }
-exports.Vertex = Vertex;
