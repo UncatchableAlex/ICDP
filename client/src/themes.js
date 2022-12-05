@@ -59,7 +59,7 @@ export function ToggleTheme(props) {
                 });
             },
         }),
-        [currMode],
+        [],
     );
     const theme = React.useMemo(
         () => currMode === "dark" ? darkTheme : lightTheme,

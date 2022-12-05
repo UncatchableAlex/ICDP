@@ -11,12 +11,12 @@ import {useState} from "react";
 import axios from "axios"
 
 
-//const buffer = require("buffer")
-//const pbkdf2 = require("pbkdf2")
+//axios.defaults.withCredentials = true;
+
 
 export function LoginPage() {
-    let [unVal, unSet] = useState("")
-    let [pwVal, pwSet] = useState("")
+    let [unVal, unSet] = useState("");
+    let [pwVal, pwSet] = useState("");
     const handleChange = (e) => {
         const setter = e.target.id === "passwordTextField" ? pwSet : unSet;
         setter(e.target.value)
@@ -40,7 +40,7 @@ export function LoginPage() {
             onKeyDown={handleKeyDown}
             onChange={handleChange}
             value={pwVal}
-            focused/>
+            focused/>;
 
     const usernameTextField =
         <TextField
@@ -55,15 +55,34 @@ export function LoginPage() {
             onKeyDown={handleKeyDown}
             onChange={handleChange}
             value={unVal}
-            focused/>
+            focused/>;
 
     const submitLoginForm = () => {
         const json = {
-                username: unVal,
-                password: pwVal
-            }
-        axios.post("http://localhost:9000/test", json)
-            .then(() => console.log("received"))
+            username: unVal,
+            password: pwVal
+        };
+        axios.post("/login", {}, {
+            headers: {
+                contentType: "application/json",
+                authorization:unVal+":"+pwVal,
+            },
+            withCredentials: true,
+           // credentials: 'include', // Don't forget to specify this if you need cookies
+        })
+            .then(
+                (res) => {
+                    if (res.data.accepted) {
+                        window.location.replace("/ICDP/index.html")
+                    } else {
+                        console.log(res.data.message);
+                    }
+                },
+                (err) => {
+                    console.log("caught an error");
+                    console.log(err.headers);
+                }
+            )
     };
 
 
