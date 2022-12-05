@@ -151,23 +151,4 @@ class Board {
             }
         }
     }
-
-    payout() {
-        console.log(game)
-        for (let q in this.tiles) {
-            for (let r in this.tiles[q]) {
-                let hex = this.tiles[q][r];
-                if (hex.number === game.currentRoll && !hex.robber) {
-                    for (let v of hex.vertices) {
-                        console.log(game.player.playerId);
-                        if (v.structure && v.playerId === game.player.playerId) {
-                            if (v.structure === "settie")
-                                game.player.resources[hex.resource]++;
-                            else game.player.resources[hex.resource] += 2;
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

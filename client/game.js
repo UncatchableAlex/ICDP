@@ -1,13 +1,13 @@
 class Game {
-  constructor(gameId, board, devis, playerId, playerName="steve") {
+  constructor(gameId, board, devis, playerId, playerName = "steve") {
     this.gameId = gameId;
     this.board = board;
     this.player = new Player(playerId, playerName);
-    this.playerCount = 4;
+    this.playerCount = 2;
     this.turn = 0;
     this.longestRoad = null;
     this.largestArmy = null;
-    this.currentPlayer = this.player.playerID === 0 ? this.player : undefined;
+    this.currentPlayer = this.player.playerId === 0 ? this.player : undefined;
     this.currentVPS;
     this.bank = new Bank(devis);
     this.hasRolled = false;
@@ -20,67 +20,72 @@ class Game {
   }
 
   // Passes the
-  playerPassGame() {
-    socket.emit("pass turn");
-    this.turn++;
-    this.currentPlayer = this.player.playerID === this.turn ? this.player : undefined;
-    this.hasRolled = false;
+  passTurn() {
+    if (this.currentPlayer) {
+      socket.emit("pass turn");
+      this.turn++;
+      this.currentPlayer = this.player.playerId === this.turn % this.playerCount ? this.player : undefined;
+      this.hasRolled = false;
+    }
   }
 
   roll() {
-    if (!this.hasRolled){
+    if (this.currentPlayer && !this.hasRolled) {
       this.currentRoll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
       this.hasRolled = true;
-      socket.emit("roll",this.currentRoll)
+      this.payout();
+      socket.emit("roll", this.currentRoll)
       return true;
     }
     return false;
+  }
+
+  payout() {
+    for (let q in this.board.tiles) {
+      for (let r in this.board.tiles[q]) {
+        let hex = this.board.tiles[q][r];
+        if (hex.number === this.currentRoll && !hex.robber) {
+          for (let v of hex.vertices) {
+            if (v.structure && v.playerId === this.player.playerId) {
+              if (v.structure === "settie")
+                game.player.resources[hex.resource]++;
+              else game.player.resources[hex.resource] += 2;
+            }
+          }
+        }
+      }
+    }
   }
 
   // Allow given player to buy development card
-  buyDevelopmentCard(player, bank) {
-    if (bank.canSellDevelopmentCard() && player.canBuyDevelopmentCard()) {
+  buy_devi() {
+    if (this.currentPlayer && this.bank.can_draw_devi() && this.player.can_buy_devi()) {
       // Player purchases development card
-      player.buyDevelopmentCard();
+      this.player.buy_devi();
       // Transfer development card from bank to player
-      player.receiveDevelopmentCard(bank.sellDevelopmentCard());
+      this.player.receive_devi(this.bank.draw_devi());
       // Give resources back to bank
-      bank.reclaimDevelopmentCard();
+      this.bank.reclaim_devi();
     }
   }
 
-  // Allow player to build a road
-  build_road(player, bank) {
-    if (player.canBuildRoad()) {
-      player.buildRoad();
-      bank.reclaimRoad();
+  build(type, x, y) {
+    if (this.currentPlayer && this.player[`can_build_${type}`]()) {
+      this.player[`build_${type}`]();
+      this.bank[`reclaim_${type}`]();
+      socket.emit("build", {
+        type: type,
+        x: x,
+        y: y
+      });
       return true;
     }
     return false;
   }
 
-  // Allow player to build a settlement
-  build_settie(player, bank) {
-    if (player.canBuildSettlement()) {
-      player.buildSettlement();
-      bank.reclaimSettlement();
-      return true;
-    }
-    return false;
-  }
-
-  // Allow player to build a settlement
-  build_city(player, bank) {
-    if (player.canUpgradeSettlement()) {
-      player.upgradeSettlement();
-      bank.reclaimCity();
-      return true;
-    }
-    return false;
-  }
 
   playMonopoly(player, resource) {
-    if (player.canPlayMonopoly()) {
+    if (this.currentPlayer && player.canPlayMonopoly()) {
       let totalStolen = 0;
       for (let otherPlayer in game.players) {
         if (otherPlayer !== player) {

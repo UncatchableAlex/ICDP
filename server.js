@@ -34,10 +34,13 @@ io.on('connection', (socket) => {
       let s = queue.dequeue();
       s.join(roomId)
       s.on("roll", (number) => {
-        io.to(roomId).emit("roll", number);
+        s.to(roomId).emit("roll", number);
       })
       s.on("pass turn", () => {
         s.to(roomId).emit("pass turn");
+      })
+      s.on("build", (info) => {
+        s.to(roomId).emit("build", info);
       })
       io.to(s.id).emit("join game", {
         tiles: tiles,
