@@ -7,13 +7,13 @@ class Player {
     this.victoryPoints = victoryPoint;
 
     this.resources = {
-      ore: 0,
-      wheat: 2,
-      sheep: 2,
       wood: 4,
       brick: 4,
+      sheep: 2,
+      wheat: 2,
+      ore: 0,
     };
-    
+
     this.developmentCards = {
       knight: 0,
       roadBuilding: 0,

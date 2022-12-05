@@ -46,7 +46,7 @@ class Bank {
   }
 
   sellDevelopmentCard() {
-    if (this.canDrawDevelopmentCard()) {
+    if (this.canSellDevelopmentCard()) {
       return this.developmentCards.shift();
     }
     return "Failed to draw development card from cards";
