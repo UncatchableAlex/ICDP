@@ -1,5 +1,4 @@
-import TextField from '@mui/material/TextField';
-import {Box, Stack, Button} from "@mui/material";
+import {Box, Stack, Button, TextField} from "@mui/material";
 import {ReactComponent as Logo} from './hexes.svg';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -10,16 +9,13 @@ import {useTheme} from "@mui/material/styles";
 import {useState} from "react";
 import axios from "axios"
 
-
 //axios.defaults.withCredentials = true;
-
-
 export function LoginPage() {
-    let [unVal, unSet] = useState("");
-    let [pwVal, pwSet] = useState("");
+    let [unState, unStateSet] = useState({helperText:"", val:"", color:"secondary"});
+    let [pwState, pwStateSet] = useState({helperText:"", val:"", color:"secondary"});
     const handleChange = (e) => {
-        const setter = e.target.id === "passwordTextField" ? pwSet : unSet;
-        setter(e.target.value)
+        const setter = e.target.id === "passwordTextField" ? pwStateSet : unStateSet;
+        setter({helperText : "", val : e.target.value, color:"secondary"})
     }
     const handleKeyDown = (e) => {
         if (e.code === "Enter") {
@@ -30,8 +26,9 @@ export function LoginPage() {
         <TextField
             id="passwordTextField"
             label="password"
-            variant="outlined"
-            color="secondary"
+            variant= "outlined"
+            helperText={pwState.helperText}
+            color={pwState.color}
             margin="normal"
             sx={{width:"75%"}}
             size="small"
@@ -39,7 +36,7 @@ export function LoginPage() {
             type="password"
             onKeyDown={handleKeyDown}
             onChange={handleChange}
-            value={pwVal}
+            value={pwState.val}
             focused/>;
 
     const usernameTextField =
@@ -47,35 +44,40 @@ export function LoginPage() {
             id="usernameTextField"
             label="username"
             variant="outlined"
-            color="secondary"
+            helperText={unState.helperText}
+            color={unState.color}
             margin="normal"
             sx={{width:"75%"}}
             size="small"
             inputProps={{style: {fontSize: 20, textAlign: "center"}}}
             onKeyDown={handleKeyDown}
             onChange={handleChange}
-            value={unVal}
+            value={unState.val}
             focused/>;
 
     const submitLoginForm = () => {
-        const json = {
-            username: unVal,
-            password: pwVal
-        };
         axios.post("/login", {}, {
             headers: {
                 contentType: "application/json",
-                authorization:unVal+":"+pwVal,
+                authorization:unState.val+":"+pwState.val,
             },
             withCredentials: true,
-           // credentials: 'include', // Don't forget to specify this if you need cookies
+            credentials: 'include', // Don't forget to specify this if you need cookies
         })
             .then(
                 (res) => {
+                    const mes = res.data.message;
+                    console.log(mes)
                     if (res.data.accepted) {
-                        window.location.replace("/ICDP/index.html")
+                      //  window.location.replace("/")
                     } else {
-                        console.log(res.data.message);
+                        console.log(mes);
+                        if (mes === "user does not exist") {
+                            unStateSet({helperText:mes, val:unState.val, color:"error"})
+                        }
+                        if (mes === "incorrect password") {
+                            pwStateSet({helperText:mes, val:pwState.val, color:"error"})
+                        }
                     }
                 },
                 (err) => {
@@ -95,7 +97,7 @@ export function LoginPage() {
                 {passwordTextField}
                 <Box height="1em"/>
                 <Stack direction="row" spacing={2} alignItems="center">
-                    <Button variant="outlined" startIcon={<HexagonOutlined />}>
+                    <Button variant="outlined" startIcon={<HexagonOutlined />} onClick={submitLoginForm}>
                         Login
                     </Button>
                     <Button variant="outlined" startIcon={<Person4Outlined />}>

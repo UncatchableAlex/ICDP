@@ -12,6 +12,7 @@ const crypto = require("crypto");
 const {Client} = require("pg");
 const auth = require("../creds.json");
 const client = new Client(auth.dbCreds);
+const cookieParser = require("cookie-parser")
 router.get('/',(req, res) => {
     res.send("hello world")
 });
@@ -31,8 +32,8 @@ const allGood = {
 
 client.connect()
 router.post('/', (req, res, next) => {
-    console.log("cookies: ")
-    console.log(req.signedCookies)
+    console.log("stored myCookie: ")
+    console.log(cookieParser.signedCookie(req.signedCookies.myCookie));
     const creds = req.headers.authorization.split(":")
     console.log(creds)
     const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(creds[0])
@@ -53,7 +54,7 @@ router.post('/', (req, res, next) => {
                 const hashed = pbkdf2.pbkdf2Sync(creds[1], dbres.rows[0].salt, 310000, 64, "sha512").toString("hex");
                 if (dbres.rows[0].pword === hashed) {
                     const rand = crypto.randomBytes(32).toString("hex");
-                    res.cookie("myCookie", rand, {signed:true, maxAge:60*60*8});
+                    res.cookie("myCookie", creds[0]+":"+rand, {signed:true, maxAge:1000*60*60*8});
                     res.send(allGood);
                     return res;
                 }
