@@ -1,6 +1,6 @@
 
-const { Board } = require("./board.js");
-const { Queue } = require("./queue.js");
+const { Queue } = require("./server/queue.js");
+const { Utils } = require("./server/utils.js")
 
 const express = require('express');
 const app = express();
@@ -10,32 +10,42 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const port = 8099;
 
-
 const queue = new Queue();
+
+var rooms = 0;
 
 app.use(express.static(__dirname + "/"));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/client/index.html');
 });
 
 io.on('connection', (socket) => {
   // enter queue
   console.log("new user")
   queue.enqueue(socket);
-  if (queue.getLength() >= 4) {
-    let roomId = "room1";
-    for (let i = 0; i < 4; i++) {
+  if (queue.getLength() >= 2) {
+    let roomId = `room ${rooms++}`;
+    console.log(`created ${roomId}`);
+
+    let tiles = Utils.get_rand_tile_seq();
+    let cards = Utils.get_rand_devi_seq();
+    for (let i = 0; i < 2; i++) {
       let s = queue.dequeue();
       s.join(roomId)
+      s.on("roll", (number) => {
+        io.to(roomId).emit("roll", number);
+      })
+      s.on("pass turn", () => {
+        s.to(roomId).emit("pass turn");
+      })
+      io.to(s.id).emit("join game", {
+        tiles: tiles,
+        cards: cards,
+        playerId: i
+      });
     }
-    let board = new Board();
-    io.to(roomId).emit("join game", board);
   }
-
-  socket.on("turn update", (info) => {
-    io.to("room1").emit("turn update", info);
-  })
 });
 
 server.listen(port, () => {
