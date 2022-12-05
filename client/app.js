@@ -10,7 +10,7 @@ const socket = io();
 socket.on("join game", (info) => {
   console.log(`joining game as player ${info.playerId}`);
   this.board = new Board(info.tiles);
-  game = new Game(0, this.board, info.cards, info.playerId)
+  game = new Game(0, this.board, info.cards, info.playerId);
   button = document.getElementById("buyDevelopmentCard");
   button.addEventListener("click", () => {
     game.buyDevelopmentCard(game.player, game.bank);
@@ -20,17 +20,17 @@ socket.on("join game", (info) => {
   this.board.draw_board();
   updateDevCardSelect();
   updateResources();
-})
+});
 
 socket.on("roll", (number) => {
   game.currentRoll = number;
   game.hasRolled = true;
   board.payout();
-})
+});
 
 socket.on("pass turn", () => {
   game.playerPassGame();
-})
+});
 
 // Update initial resources
 
@@ -77,8 +77,6 @@ button.addEventListener("click", () => {
   updateDevCardSelect();
 });
 
-
-
 function updateResources() {
   let resource = document.querySelectorAll('td[id^="resources"]');
   let t = 0;
@@ -109,19 +107,15 @@ function updateDevCardSelect() {
   document.getElementById("devCardSelect").replaceWith(selectList);
 }
 
-
-
 // Work in progress!
 function selectResource() {
   let row = document.createElement("tr");
   row.id = "selectResourceId";
-
   let td = document.createElement("td");
   let wood = document.createElement("button");
   let brick = document.createElement("button");
   let sheep = document.createElement("button");
   let wheat = document.createElement("button");
   let ore = document.createElement("button");
-
   let cardTable = document.getElementById("devCardTable");
 }
