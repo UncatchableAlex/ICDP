@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="client/style.css">
+</head>
+
+<body>
+    <script>
+        function dragstart_handler(event) {
+            event.dataTransfer.setData("text/plain", event.target.id);
+        }
+    </script>
+    <div>
+        <canvas id="canvas" width="600" height="600"></canvas>
+
+        <table>
+            <tr>
+                <td>Wood</td>
+                <td>Brick</td>
+                <td>Sheep</td>
+                <td>Wheat</td>
+                <td>Ore</td>
+            </tr>
+            <tr id>
+                <td id = "resources">0</td>
+                <td id = "resources">0</td>
+                <td id = "resources">0</td>
+                <td id = "resources">0</td>
+                <td id = "resources">0</td>
+            </tr>
+
+        </table>
+
+        <table>
+            <tr>
+                <td><p id="settie" draggable="true" ondragstart="dragstart_handler(event)">settie</p></td>
+                <td> <p id="road" draggable="true" ondragstart="dragstart_handler(event)">road</p></td>
+                <td><p id="city" draggable="true" ondragstart="dragstart_handler(event)">city</p></td>
+                
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <tr>
+                    <td><button id="roll">roll</button></td>
+                    <td><button id="pass">end turn</button></td>
+                </tr>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td>Knight</td>
+                <td>Road Building</td>
+                <td>Year of Plenty</td>
+                <td>Monopoly</td>
+                <td>Victory Point</td>
+            </tr>
+            <tr>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+            </tr>
+        </table>
+        <table id = "devCardTable">
+            <tr>
+                <td> <label id="devCard">Development Cards:</label></td>
+                <td><select name="Development Card Select" id="devCardSelect"></select></td>
+                <td><button id ="playCard" value="Play Card">Play Card</button></td>
+                <td><button id = "buyDevelopmentCard">Buy Development Card</button></td>
+            </tr>
+        </table>
+        
+    </div>
+    <script src="client/utils.js"></script>
+    <script src="client/edge.js"></script>
+    <script src="client/vertex.js"></script>
+    <script src="client/hex.js"></script>
+    <script src="client/board.js"></script>
+    <script src="client/player.js"></script>
+    <script src="client/bank.js"></script>
+    <script src="client/game.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client/app.js"></script>
+</body>
+
+</html>
