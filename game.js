@@ -27,7 +27,8 @@ class Game {
   }
 
   roll() {
-    this.currentRoll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+    this.currentRoll =
+      2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
     this.hasRolled = true;
   }
 
@@ -37,7 +38,7 @@ class Game {
       // Player purchases development card
       player.buyDevelopmentCard();
       // Transfer development card from bank to player
-      receiveDevelopmentCard(bank.sellDevelopmentCard());
+      player.receiveDevelopmentCard(bank.sellDevelopmentCard());
       // Give resources back to bank
       bank.reclaimDevelopmentCard();
     }
@@ -72,4 +73,29 @@ class Game {
     }
     return false;
   }
+
+  playMonopoly(player, resource) {
+    if (player.canPlayMonopoly()) {
+      let totalStolen = 0;
+      for (let otherPlayer in game.players) {
+        if (otherPlayer !== player) {
+          // Add all of players resources to total stolen
+          totalStolen += otherPlayer.resources[resource];
+          // Remove all of that players resources
+          otherPlayer.resources[resource] = 0;
+        }
+      }
+    }
+    // Give player all of the stolen resource
+    player.resources[resource] += totalResources;
+  }
+
+  playYearOfPlenty(player, resource1, resource2) {
+    if (player.canPlayYearOfPlenty) {
+      player.resources[resource1]++;
+      player.resources[resource2]++;
+    }
+  }
+
+  playKnight(player, location) {}
 }
