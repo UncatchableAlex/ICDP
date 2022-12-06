@@ -6,7 +6,6 @@ var board;
 var game;
 
 // Update initial resources
-
 canvas.addEventListener("dragover", (event) => {
   event.preventDefault();
 });

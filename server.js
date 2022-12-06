@@ -44,15 +44,13 @@ io.on("connection", (socket) => {
       });
       s.on("build", (info) => {
         s.to(roomId).emit("build", info);
-      })
+      });
       io.to(s.id).emit("join game", {
         tiles: tiles,
         cards: cards,
         playerId: i,
       });
     }
-    // dbpop.getAll();
-    //dbpop.getAll();
   }
 });
 

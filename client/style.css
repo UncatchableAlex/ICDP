@@ -1,3 +1,8 @@
-table, th, td {
+.innerTable, th, td {
     border: 1px solid black;
+    
   }
+
+.outerTable, th, tr{
+  border:0px solid transparent;
+}
