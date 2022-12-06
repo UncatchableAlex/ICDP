@@ -5,33 +5,6 @@ const tileSize = Math.floor(canvas.width / (5 * Math.sqrt(3)));
 var board;
 var game;
 
-const socket = io();
-
-socket.on("join game", (info) => {
-  console.log(`joining game as player ${info.playerId}`);
-  this.board = new Board(info.tiles);
-  game = new Game(0, this.board, info.cards, info.playerId);
-  button = document.getElementById("buyDevelopmentCard");
-  button.addEventListener("click", () => {
-    game.buyDevelopmentCard(game.player, game.bank);
-    updateDevCardSelect();
-    updateResources();
-  });
-  this.board.draw_board();
-  updateDevCardSelect();
-  updateResources();
-});
-
-socket.on("roll", (number) => {
-  game.currentRoll = number;
-  game.hasRolled = true;
-  board.payout();
-});
-
-socket.on("pass turn", () => {
-  game.playerPassGame();
-});
-
 // Update initial resources
 
 canvas.addEventListener("dragover", (event) => {
@@ -40,15 +13,15 @@ canvas.addEventListener("dragover", (event) => {
 
 canvas.addEventListener("drop", (event) => {
   let type = event.dataTransfer.getData("text/plain");
-  let res = this.board[`add_${type}`](
+  let res = board[`add_${type}`](
     event.offsetX,
     event.offsetY,
     game.turn % game.playerCount
   );
   if (res) {
-    res = game[`build_${type}`](game.player, game.bank);
+    res = game.build(type, event.offsetX, event.offsetY);
     if (res) {
-      this.board.draw_board();
+      board.draw_board();
       updateResources();
     }
   }
@@ -57,14 +30,14 @@ canvas.addEventListener("drop", (event) => {
 //roll dice and distribute resource
 let button = document.getElementById("roll");
 button.addEventListener("click", () => {
-  if (!game.hasRolled) {
+  if (game.currentPlayer && !game.hasRolled) {
     game.roll();
     console.log(game.currentRoll);
   }
 
   button = document.getElementById("pass");
   button.addEventListener("click", () => {
-    if (game.hasRolled) game.playerPassGame();
+    game.passTurn();
   });
 
   // work in progress for playing development cards
@@ -105,17 +78,4 @@ function updateDevCardSelect() {
     }
   }
   document.getElementById("devCardSelect").replaceWith(selectList);
-}
-
-// Work in progress!
-function selectResource() {
-  let row = document.createElement("tr");
-  row.id = "selectResourceId";
-  let td = document.createElement("td");
-  let wood = document.createElement("button");
-  let brick = document.createElement("button");
-  let sheep = document.createElement("button");
-  let wheat = document.createElement("button");
-  let ore = document.createElement("button");
-  let cardTable = document.getElementById("devCardTable");
 }

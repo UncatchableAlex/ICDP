@@ -17,47 +17,47 @@ class Bank {
     this.developmentCards = developmentCards;
   }
 
-  canDrawDevelopmentCard() {
+  can_draw_devi() {
     return developmentCards.length > 0;
   }
 
-  drawDevelopmentCard() {
+  draw_devi() {
     if (this.canSellDevelopmentCard()) {
       return developmentCards.shift();
     }
     return "Failed to draw development card from cards";
   }
 
-  canDraw(type, amount) {
+  can_draw(type, amount) {
     return this.resources[type] >= amount;
   }
 
   draw(type, amount) {
-    if (this.canDraw(type, amount)){
+    if (this.can_draw(type, amount)){
       this.resources[type] -= amount;
       return true;
     }
     return false;
   }
 
-  reclaimRoad() {
+  reclaim_road() {
     this.resources.wood++;
     this.resources.brick++;
   }
 
-  reclaimSettlement() {
+  reclaim_settie() {
     this.resources.wood++;
     this.resources.brick++;
     this.resources.sheep++;
     this.resources.wheat++;
   }
 
-  reclaimCity() {
+  reclaim_city() {
     this.resources.wheat += 2;
     this.resources.ore += 3;
   }
 
-  reclaimDevelopmentCard() {
+  reclaim_devi() {
     this.resources.wheat++;
     this.resources.sheep++;
     this.resources.ore++;

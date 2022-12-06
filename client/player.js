@@ -1,8 +1,8 @@
 class Player {
   static COLORS = ["red", "white", "blue", "DarkOrange"];
 
-  constructor(playerID, playerName) {
-    this.playerID = playerID;
+  constructor(playerId, playerName) {
+    this.playerId = playerId;
     this.playerName = playerName;
     this.victoryPoints = 0;
 
@@ -40,7 +40,7 @@ class Player {
     return this.victoryPoints + this.developmentCards.victoryPoint;
   }
 
-  canBuildRoad() {
+  can_build_road() {
     return (
       this.resources.wood >= 1 &&
       this.resources.brick >= 1 &&
@@ -48,8 +48,8 @@ class Player {
     );
   }
 
-  buildRoad() {
-    if (this.canBuildRoad()) {
+  build_road() {
+    if (this.can_build_road()) {
       this.resources.wood--;
       this.resources.brick--;
       this.buildings.roads--;
@@ -58,7 +58,7 @@ class Player {
     return false;
   }
 
-  canBuildSettlement() {
+  can_build_settie() {
     return (
       this.resources.wood >= 1 &&
       this.resources.brick >= 1 &&
@@ -68,8 +68,8 @@ class Player {
     );
   }
 
-  buildSettlement() {
-    if (this.canBuildSettlement()) {
+  build_settie() {
+    if (this.can_build_settie()) {
       this.resources.wood--;
       this.resources.brick--;
       this.resources.wheat--;
@@ -80,7 +80,7 @@ class Player {
     return false;
   }
 
-  canUpgradeSettlement() {
+  can_build_city() {
     return (
       this.resources.wheat >= 2 &&
       this.resources.ore >= 2 &&
@@ -88,8 +88,8 @@ class Player {
     );
   }
 
-  upgradeSettlement() {
-    if (this.canUpgradeSettlement()) {
+  build_city() {
+    if (this.can_build_city()) {
       this.resources.wheat -= 2;
       this.resources.ore -= 3;
       this.buildings.cities--;
@@ -99,7 +99,7 @@ class Player {
     return false;
   }
 
-  canBuyDevelopmentCard() {
+  can_buy_devi() {
     return (
       this.resources.wheat >= 1 &&
       this.resources.sheep >= 1 &&
@@ -107,67 +107,30 @@ class Player {
     );
   }
 
-  buyDevelopmentCard() {
-    if (this.canBuyDevelopmentCard()) {
+  buy_devi() {
+    if (this.can_buy_devi()) {
       this.resources.wheat--;
       this.resources.sheep--;
       this.resources.ore--;
-    }
-  }
-
-  canPlayKnight() {
-    return this.developmentCards.knight >= 1;
-  }
-
-  playKnight() {
-    if (this.canPlayKnight()) {
-      this.developmentCards.knight--;
-      this.developmentCardsPlayed.knight++;
       return true;
     }
     return false;
   }
 
-  canPlayRoadBuilding() {
-    return this.developmentCards.roadBuilding >= 1;
+  can_play_devi(type) {
+    return this.developmentCards[type] >= 1;
   }
 
-  playRoadBuilding() {
-    if (this.canPlayRoadBuilding()) {
-      this.developmentCards.roadBuilding--;
-      this.developmentCardsPlayed.roadBuilding++;
+  play_devi(type) {
+    if (this.can_play_devi(type)) {
+      this.developmentCards[type]--;
+      this.developmentCardsPlayed[type]++;
       return true;
     }
     return false;
   }
 
-  canPlayYearOfPlenty() {
-    return this.developmentCards.roadBuilding >= 1;
-  }
-
-  playYearOfPlenty() {
-    if (this.canPlayYearOfPlenty()) {
-      this.developmentCards.yearOfPlenty--;
-      this.developmentCardsPlayed.yearOfPlenty++;
-      return true;
-    }
-    return false;
-  }
-
-  canPlayMonopoly() {
-    return this.developmentCards.monopoly >= 1;
-  }
-
-  playMonopoly() {
-    if (this.canPlayMonopoly()) {
-      this.developmentCards.monopoly--;
-      this.developmentCardsPlayed.monopoly++;
-      return true;
-    }
-    return false;
-  }
-
-  receiveDevelopmentCard(developmentCard) {
+  receive_devi(developmentCard) {
     this.developmentCards[developmentCard]++;
   }
 }
