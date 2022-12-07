@@ -12,14 +12,25 @@ canvas.addEventListener("dragover", (event) => {
 });
 
 canvas.addEventListener("drop", (event) => {
+  let playerId;
+  if (game.turn < 2 * game.playerCount) {
+    if (game.turn < game.playerCount) {
+      playerId = game.turn;
+    } else {
+      playerId = game.playerCount - game.turn % game.playerCount - 1;
+    }
+  } else {
+    playerId =  game.turn % game.playerCount;
+  }
   let type = event.dataTransfer.getData("text/plain");
-  let res = board[`add_${type}`](
+  let hex = board[`can_add_${type}`](
     event.offsetX,
     event.offsetY,
-    game.turn % game.playerCount
+   playerId
   );
-  if (res) {
-    res = game.build(type, event.offsetX, event.offsetY);
+  if (hex) {
+    let res = game.build(type, hex);
+    console.log(res);
     if (res) {
       board.draw_board();
       updateResources();
@@ -47,7 +58,7 @@ button.addEventListener("click", () => {
 // work in progress for playing development cards
 button = document.getElementById("playCard");
 button.addEventListener("click", () => {
-  
+
   updateResources();
   updateDevCardSelect();
 });

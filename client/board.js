@@ -75,6 +75,15 @@ class Board {
         });
     }
 
+    add(type, q, r, playerId) {
+        if (type === "settie" || type === "city") {
+            this.vertices[q][r].playerId = playerId;
+            this.vertices[q][r].structure = "settie";
+        } else {
+            this.edges[q][r].playerId = playerId;
+        }
+    }
+
     has(type, hex) {
         return type in this && hex.q in this[type] && hex.r in this[type][hex.q];
     }
@@ -85,7 +94,7 @@ class Board {
         }
     }
 
-    add_settie(x, y, playerId) {
+    can_add_settie(x, y, playerId) {
         let pos = Utils.pixelToHex(x - this.offsetX, y - this.offsetY);
         pos.q = Math.round(pos.q * 3);
         pos.r = Math.round(pos.r * 3);
@@ -95,26 +104,24 @@ class Board {
             for (let e of v.edges) {
                 if (e.vertices[0].structure !== undefined || e.vertices[1].structure !== undefined) return false;
             }
-            v.structure = "settie";
-            v.playerId = playerId;
-            return true;
+            return pos;
         }
         return false;
     }
 
-    add_city(x, y, playerId) {
+    can_add_city(x, y, playerId) {
         let pos = Utils.pixelToHex(x - this.offsetX, y - this.offsetY);
         pos.q = Math.round(pos.q * 3);
         pos.r = Math.round(pos.r * 3);
         let v = this.get("vertices", pos);
         if (v && v.structure === "settie" && v.playerId === playerId) {
-            v.structure = "city";
-            return true;
+            return pos;
         }
         return false;
     }
 
-    add_road(x, y, playerId) {
+    can_add_road(x, y, playerId) {
+        console.log("Id: ",playerId)
         let pos = Utils.pixelToHex(x - this.offsetX, y - this.offsetY);
         pos.q = Math.round(pos.q * 2);
         pos.r = Math.round(pos.r * 2);
@@ -135,8 +142,7 @@ class Board {
                 }
             }
             if (!valid) return false;
-            e.playerId = playerId;
-            return true;
+            return pos;
         }
         return false
     }
@@ -145,49 +151,19 @@ class Board {
         ctx.fillStyle = "DeepSkyBlue"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let type of ["tiles", "edges", "vertices"]) {
-            for (let i in this[type]) {
-                for (let j in this[type][i]) {
-                    this[type][i][j].draw();
-                }
-            }
+            this.forEach(type, (q, r, e) => { e.draw() })
         }
     }
 
-    #forEach(type, callback) {
+    forEach(type, callback) {
         let i = 0
         if (type) {
             for (let q in this[type]) {
-                for (let r in this[type][r]) {
+                for (let r in this[type][q]) {
+                    let comp = this[type][q][r];
                     callback(q, r, comp, i++);
                 }
             }
         }
-    }
-
-    get_state() {
-        let output = {
-            vertices: [],
-            edges: [],
-            robber: { q: this.robber.q, r: this.robber.r }
-        };
-        this.#forEach("vertices", (q, r, v) => {
-            output.vertices.push({ structure: v.structure, playerId: v.playerId });
-        });
-        this.#forEach("edges", (q, r, e) => {
-            output.edges.push({ playerId: e.playerId });
-        });
-        return output;
-    }
-
-    set_state(state) {
-        this.robber = state.robber;
-        this.#forEach("vertices", (q, r, v, i) => {
-            v.structure = state.vertices[i].structure;
-            v.playerId = state.vertices[i].playerId;
-        });
-        this.#forEach("edges", (q, r, e, i) => {
-            e.structure = state.edges[i].structure;
-            e.playerId = state.edges[i].playerId;
-        });
     }
 }

@@ -4,7 +4,7 @@ class Game {
     this.board = board;
     this.player = new Player(playerId, playerName);
     this.playerCount = 2;
-    this.turn = 0;
+    this.turn = -1;
     this.longestRoad = null;
     this.largestArmy = null;
     this.currentPlayer = this.player.playerId === 0 ? this.player : undefined;
@@ -40,20 +40,18 @@ class Game {
   }
 
   payout() {
-    for (let q in this.board.tiles) {
-      for (let r in this.board.tiles[q]) {
-        let hex = this.board.tiles[q][r];
-        if (hex.number === this.currentRoll && !hex.robber) {
-          for (let v of hex.vertices) {
-            if (v.structure && v.playerId === this.player.playerId) {
-              if (v.structure === "settie")
-                game.player.resources[hex.resource]++;
-              else game.player.resources[hex.resource] += 2;
-            }
+    this.board.forEach("tiles",(q,r,hex) => {
+      if (hex.number === this.currentRoll && !hex.robber) {
+        for (let v of hex.vertices) {
+          if (v.structure !== undefined && v.playerId === this.player.playerId) {
+            if (v.structure === "settie")
+              game.player.resources[hex.resource]++;
+            else if (v.structure === "city")
+              game.player.resources[hex.resource] += 2;
           }
         }
       }
-    }
+    });
   }
 
   // Allow given player to buy development card
@@ -68,15 +66,12 @@ class Game {
     }
   }
 
-  build(type, x, y) {
+  build(type, hex) {
     if (this.currentPlayer && this.player[`can_build_${type}`]()) {
       this.player[`build_${type}`]();
       this.bank[`reclaim_${type}`]();
-      socket.emit("build", {
-        type: type,
-        x: x,
-        y: y
-      });
+      hex.type = type
+      socket.emit("build", hex);
       return true;
     }
     return false;

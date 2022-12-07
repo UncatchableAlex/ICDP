@@ -7,10 +7,10 @@ class Player {
     this.victoryPoints = 0;
 
     this.resources = {
-      wood: 4,
-      brick: 4,
-      sheep: 2,
-      wheat: 2,
+      wood: 0,
+      brick: 0,
+      sheep: 0,
+      wheat: 0,
       ore: 0,
     };
 

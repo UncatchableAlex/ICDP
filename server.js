@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
         io.to(roomId).emit("pass turn");
       })
       s.on("build", (info) => {
-        s.to(roomId).emit("build", info);
+        io.to(roomId).emit("build", info);
       })
       io.to(s.id).emit("join game", {
         tiles: tiles,
@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
         playerId: i
       });
     }
+    io.to(roomId).emit("pass turn");
   }
 });
 
