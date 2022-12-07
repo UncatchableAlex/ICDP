@@ -1,4 +1,5 @@
 /**
+ *
  * Encompasses the default Catan bank with
  * all resources and development cards along
  * with all the functions needed to ensure the

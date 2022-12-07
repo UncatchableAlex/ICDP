@@ -1,9 +1,19 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const tileSize = Math.floor(canvas.width / (5 * Math.sqrt(3)));
 
 var board;
 var game;
+
+socket.on("roll", (number) => {
+  game.currentRoll = number;
+  game.hasRolled = true;
+  game.payout();
+  updateResources();
+});
+
+socket.on("pass turn", () => {
+  game.playerPassGame();
+});
 
 // Update initial resources
 
@@ -34,6 +44,7 @@ canvas.addEventListener("drop", (event) => {
     if (res) {
       board.draw_board();
       updateResources();
+      updateVPS();
     }
   }
 });
@@ -45,9 +56,6 @@ button.addEventListener("click", () => {
     game.roll();
     console.log(game.currentRoll);
   }
-
-  updateResources();
-  updateDevCardSelect();
 });
 
 button = document.getElementById("pass");
@@ -58,9 +66,18 @@ button.addEventListener("click", () => {
 // work in progress for playing development cards
 button = document.getElementById("playCard");
 button.addEventListener("click", () => {
-
-  updateResources();
+  let select = document.getElementById("devCardSelect");
   updateDevCardSelect();
+  updateVPS();
+});
+
+button = document.getElementById("buyDevelopmentCard");
+button.addEventListener("click", () => {
+  console.log("Here");
+  game.draw_devi();
+  updateDevCardSelect();
+  updateResources();
+  updateVPS();
 });
 
 
@@ -89,14 +106,19 @@ function updateDevCardSelect() {
   }
 
   let selectList = document.createElement("select");
+  selectList.id = "devCardSelect";
   for (let dev in game.player.developmentCards) {
     if (game.player.developmentCards[dev] > 0 && dev != "victoryPoint") {
       let option = document.createElement("option");
-      option.id = "devCardSelect";
       option.text = dev;
       option.value = dev;
       selectList.appendChild(option);
     }
   }
   document.getElementById("devCardSelect").replaceWith(selectList);
+}
+
+function updateVPS() {
+  vps = document.getElementById("vpCounter");
+  vps.innerHTML = game.player.getVPS();
 }

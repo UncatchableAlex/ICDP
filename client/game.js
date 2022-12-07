@@ -55,8 +55,12 @@ class Game {
   }
 
   // Allow given player to buy development card
-  buy_devi() {
-    if (this.currentPlayer && this.bank.can_draw_devi() && this.player.can_buy_devi()) {
+  draw_devi() {
+    if (
+      this.currentPlayer &&
+      this.bank.can_draw_devi() &&
+      this.player.can_buy_devi()
+    ) {
       // Player purchases development card
       this.player.buy_devi();
       // Transfer development card from bank to player
@@ -76,7 +80,6 @@ class Game {
     }
     return false;
   }
-
 
   playMonopoly(player, resource) {
     if (this.currentPlayer && player.canPlayMonopoly()) {
@@ -101,5 +104,5 @@ class Game {
     }
   }
 
-  playKnight(player, location) { }
+  playKnight(player, location) {}
 }

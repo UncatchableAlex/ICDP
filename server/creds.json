@@ -1,0 +1,9 @@
+{
+  "dbCreds": {
+    "user": "postgres",
+    "host": "icdp.cpx1oizr42jg.us-east-2.rds.amazonaws.com",
+    "password": "CS455Master",
+    "port": 5432
+  },
+  "cookieSignature" : "optimal_milk_dunking_cookie"
+}

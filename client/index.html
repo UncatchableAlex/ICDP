@@ -18,40 +18,63 @@
     <div>
         <canvas id="canvas" width="500" height="500"></canvas>
 
-        <table>
+        <table class="outerTable">
             <tr>
-                <td>Wood</td>
-                <td>Brick</td>
-                <td>Sheep</td>
-                <td>Wheat</td>
-                <td>Ore</td>
+                <td>
+                    <table>
+                        <tr><td align="center"><button id="roll">roll</button></td>
+                        <tr><td align="center"><button id="pass">end turn</button></td></tr>
+                    </table>
+                </td>
+                <td>
+                    <table class = "innerTable">
+                        <tr>
+                            <td>Wood</td>
+                            <td>Brick</td>
+                            <td>Sheep</td>
+                            <td>Wheat</td>
+                            <td>Ore</td>
+                        </tr>
+                        <tr id>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="innerTable">
+                        <tr>
+                            <td><p id="settie" draggable="true" ondragstart="dragstart_handler(event)">settie</p></td>
+                            <td> <p id="road" draggable="true" ondragstart="dragstart_handler(event)">road</p></td>
+                            <td><p id="city" draggable="true" ondragstart="dragstart_handler(event)">city</p></td>
+                            
+                        </tr>
+                    </table>
+                </td>    
+                    
+                    <td>
+                        <table>
+                            <th>
+                                Victory Points 
+                            </th>
+                            <tr>
+                                <td id = "vpCounter", style=" text-align: center">
+                                    0
+                                </td>
+                                
+                            </tr>
+                        </table>
+                    </td>
             </tr>
-            <tr id>
-                <td id = "resources">0</td>
-                <td id = "resources">0</td>
-                <td id = "resources">0</td>
-                <td id = "resources">0</td>
-                <td id = "resources">0</td>
-            </tr>
-
         </table>
 
-        <table>
-            <tr>
-                <td><p id="settie" draggable="true" ondragstart="dragstart_handler(event)">settie</p></td>
-                <td> <p id="road" draggable="true" ondragstart="dragstart_handler(event)">road</p></td>
-                <td><p id="city" draggable="true" ondragstart="dragstart_handler(event)">city</p></td>
-                
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <tr>
-                    <td><button id="roll">roll</button></td>
-                    <td><button id="pass">end turn</button></td>
-                </tr>
-            </tr>
-        </table>
+
+
+        
+        
         <table>
             <tr>
                 <td>Knight</td>
