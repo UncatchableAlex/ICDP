@@ -8,6 +8,7 @@ class Game {
     this.longestRoad = null;
     this.largestArmy = null;
     this.currentPlayer = this.player.playerId === 0 ? this.player : undefined;
+    if (this.currentPlayer) alert("It's your turn");
     this.currentVPS;
     this.bank = new Bank(devis);
     this.hasRolled = false;
@@ -35,6 +36,7 @@ class Game {
       this.hasRolled = true;
       this.payout();
       socket.emit("roll", this.currentRoll)
+      alert(`${this.currentRoll} was rolled`);
       return true;
     }
     return false;

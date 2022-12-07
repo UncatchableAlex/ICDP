@@ -17,6 +17,7 @@ socket.on("join game", (info) => {
 
 socket.on("roll", (number) => {
     console.log(number+" rolled")
+    alert(`${number} was rolled`);
     game.currentRoll = number;
     game.hasRolled = true;
     game.payout();
@@ -26,6 +27,7 @@ socket.on("pass turn", () => {
     console.log("turn passed")
     game.turn++;
     game.currentPlayer = game.player.playerId === game.turn % game.playerCount ? true : false;
+    if (game.currentPlayer) alert("It's your turn")
     game.hasRolled = false;
 })
 
