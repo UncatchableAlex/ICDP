@@ -50,7 +50,6 @@ io.on("connection", async (socket) => {
       });
     }
   }
-  //PopulateDatabase.addTurnTest();
 });
 
 server.listen(port, () => {
