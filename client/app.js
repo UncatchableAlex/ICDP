@@ -7,7 +7,8 @@ var game;
 socket.on("roll", (number) => {
   game.currentRoll = number;
   game.hasRolled = true;
-  board.payout();
+  game.payout();
+  updateResources();
 });
 
 socket.on("pass turn", () => {
