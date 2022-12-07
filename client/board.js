@@ -35,6 +35,7 @@ class Board {
             let q = coord[0];
             let r = coord[1];
 
+            if (resources[index] === "desert") this.robber = { q: q, r: r };
             let num = resources[index] === "desert" ? 0 : numbers.pop();
             this.tiles[q] = this.tiles[q] || {};
 
@@ -150,5 +151,43 @@ class Board {
                 }
             }
         }
+    }
+
+    #forEach(type, callback) {
+        let i = 0
+        if (type) {
+            for (let q in this[type]) {
+                for (let r in this[type][r]) {
+                    callback(q, r, comp, i++);
+                }
+            }
+        }
+    }
+
+    get_state() {
+        let output = {
+            vertices: [],
+            edges: [],
+            robber: { q: this.robber.q, r: this.robber.r }
+        };
+        this.#forEach("vertices", (q, r, v) => {
+            output.vertices.push({ structure: v.structure, playerId: v.playerId });
+        });
+        this.#forEach("edges", (q, r, e) => {
+            output.edges.push({ playerId: e.playerId });
+        });
+        return output;
+    }
+
+    set_state(state) {
+        this.robber = state.robber;
+        this.#forEach("vertices", (q, r, v, i) => {
+            v.structure = state.vertices[i].structure;
+            v.playerId = state.vertices[i].playerId;
+        });
+        this.#forEach("edges", (q, r, e, i) => {
+            e.structure = state.edges[i].structure;
+            e.playerId = state.edges[i].playerId;
+        });
     }
 }

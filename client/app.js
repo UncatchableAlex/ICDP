@@ -35,22 +35,30 @@ button.addEventListener("click", () => {
     console.log(game.currentRoll);
   }
 
-  button = document.getElementById("pass");
-  button.addEventListener("click", () => {
-    game.passTurn();
-  });
+  updateResources();
+  updateDevCardSelect();
+});
 
-  // work in progress for playing development cards
-  button = document.getElementById("playCard");
-  button.addEventListener("click", () => {
-    let select = document.getElementById("devCardSelect");
-  });
+button = document.getElementById("pass");
+button.addEventListener("click", () => {
+  game.passTurn();
+});
 
+// work in progress for playing development cards
+button = document.getElementById("playCard");
+button.addEventListener("click", () => {
+  
   updateResources();
   updateDevCardSelect();
 });
 
 
+button = document.getElementById("buyDevelopmentCard");
+button.addEventListener("click", () => {
+  game.draw_devi();
+  updateDevCardSelect();
+  updateResources();
+});
 
 function updateResources() {
   let resource = document.querySelectorAll('td[id^="resources"]');

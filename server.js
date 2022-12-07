@@ -33,11 +33,12 @@ io.on('connection', (socket) => {
     for (let i = 0; i < 2; i++) {
       let s = queue.dequeue();
       s.join(roomId)
-      s.on("roll", (number) => {
-        s.to(roomId).emit("roll", number);
+      s.on("roll", () => {
+        let num = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+        io.to(roomId).emit("roll", num);
       })
       s.on("pass turn", () => {
-        s.to(roomId).emit("pass turn");
+        io.to(roomId).emit("pass turn");
       })
       s.on("build", (info) => {
         s.to(roomId).emit("build", info);

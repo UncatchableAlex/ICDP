@@ -13,17 +13,16 @@ class Bank {
       wood: 19,
       brick: 19,
     };
-
     this.developmentCards = developmentCards;
   }
 
   can_draw_devi() {
-    return developmentCards.length > 0;
+    return this.developmentCards.length > 0;
   }
 
   draw_devi() {
-    if (this.canSellDevelopmentCard()) {
-      return developmentCards.shift();
+    if (this.can_draw_devi()) {
+      return this.developmentCards.pop();
     }
     return "Failed to draw development card from cards";
   }
@@ -33,7 +32,7 @@ class Bank {
   }
 
   draw(type, amount) {
-    if (this.can_draw(type, amount)){
+    if (this.can_draw(type, amount)) {
       this.resources[type] -= amount;
       return true;
     }
@@ -61,5 +60,21 @@ class Bank {
     this.resources.wheat++;
     this.resources.sheep++;
     this.resources.ore++;
+  }
+
+  get_state() {
+    let output = {
+      resources: {},
+      developmentCards: this.developmentCards.splice(0)
+    };
+    for (let r in this.resources) {
+      output.resources[r] = this.resources[r];
+    }
+    return output;
+  }
+
+  set_state(state) {
+    this.resources = state.resources;
+    this.developmentCards = state.developmentCards;
   }
 }

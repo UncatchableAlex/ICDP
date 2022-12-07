@@ -8,7 +8,6 @@ class Game {
     this.longestRoad = null;
     this.largestArmy = null;
     this.currentPlayer = this.player.playerId === 0 ? this.player : undefined;
-    if (this.currentPlayer) alert("It's your turn");
     this.currentVPS;
     this.bank = new Bank(devis);
     this.hasRolled = false;
@@ -22,21 +21,19 @@ class Game {
 
   // Passes the
   passTurn() {
-    if (this.currentPlayer) {
+    if (this.currentPlayer && this.turn < 2 * this.playerCount) {
+      if (this.currentPlayer) socket.emit("pass turn");
+      return true;
+    } else if (this.currentPlayer && this.hasRolled) {
       socket.emit("pass turn");
-      this.turn++;
-      this.currentPlayer = this.player.playerId === this.turn % this.playerCount ? this.player : undefined;
-      this.hasRolled = false;
+      return true;
     }
+    return false;
   }
 
   roll() {
-    if (this.currentPlayer && !this.hasRolled) {
-      this.currentRoll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
-      this.hasRolled = true;
-      this.payout();
+    if (this.turn >= 2 * this.playerCount && this.currentPlayer && !this.hasRolled) {
       socket.emit("roll", this.currentRoll)
-      alert(`${this.currentRoll} was rolled`);
       return true;
     }
     return false;
