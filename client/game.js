@@ -24,17 +24,21 @@ class Game {
     if (this.currentPlayer) {
       socket.emit("pass turn");
       this.turn++;
-      this.currentPlayer = this.player.playerId === this.turn % this.playerCount ? this.player : undefined;
+      this.currentPlayer =
+        this.player.playerId === this.turn % this.playerCount
+          ? this.player
+          : undefined;
       this.hasRolled = false;
     }
   }
 
   roll() {
     if (this.currentPlayer && !this.hasRolled) {
-      this.currentRoll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+      this.currentRoll =
+        2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
       this.hasRolled = true;
       this.payout();
-      socket.emit("roll", this.currentRoll)
+      socket.emit("roll", this.currentRoll);
       return true;
     }
     return false;
@@ -58,8 +62,12 @@ class Game {
   }
 
   // Allow given player to buy development card
-  buy_devi() {
-    if (this.currentPlayer && this.bank.can_draw_devi() && this.player.can_buy_devi()) {
+  draw_devi() {
+    if (
+      this.currentPlayer &&
+      this.bank.can_draw_devi() &&
+      this.player.can_buy_devi()
+    ) {
       // Player purchases development card
       this.player.buy_devi();
       // Transfer development card from bank to player
@@ -76,13 +84,12 @@ class Game {
       socket.emit("build", {
         type: type,
         x: x,
-        y: y
+        y: y,
       });
       return true;
     }
     return false;
   }
-
 
   playMonopoly(player, resource) {
     if (this.currentPlayer && player.canPlayMonopoly()) {
@@ -107,5 +114,5 @@ class Game {
     }
   }
 
-  playKnight(player, location) { }
+  playKnight(player, location) {}
 }

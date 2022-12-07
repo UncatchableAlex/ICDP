@@ -11,7 +11,6 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const port = 8099;
 
-const dbpop = new PopulateDatabase();
 const queue = new Queue();
 var rooms = 0;
 
@@ -21,7 +20,7 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/client/index.html");
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   // enter queue
   console.log("new user");
   queue.enqueue(socket);
@@ -32,7 +31,6 @@ io.on("connection", (socket) => {
     let tiles = Utils.get_rand_tile_seq();
     let cards = Utils.get_rand_devi_seq();
 
-    let players = [];
     for (let i = 0; i < 2; i++) {
       let s = queue.dequeue();
       s.join(roomId);
@@ -52,6 +50,7 @@ io.on("connection", (socket) => {
       });
     }
   }
+  //PopulateDatabase.addTurnTest();
 });
 
 server.listen(port, () => {

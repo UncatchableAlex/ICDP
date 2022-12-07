@@ -75,6 +75,7 @@ class Player {
       this.resources.wheat--;
       this.resources.sheep--;
       this.buildings.settlements--;
+      this.victoryPoints++;
       return true;
     }
     return false;
@@ -94,6 +95,7 @@ class Player {
       this.resources.ore -= 3;
       this.buildings.cities--;
       this.buildings.settlements++;
+      this.victoryPoints++;
       return true;
     }
     return false;

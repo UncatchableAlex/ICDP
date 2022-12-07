@@ -1,3 +1,4 @@
+const tileSize = Math.floor(canvas.width / (5 * Math.sqrt(3)));
 class Utils {
     static hexToPixel(q, r, size = tileSize) {
         return {

@@ -35,6 +35,7 @@ class Board {
     this.tiles = {};
     this.edges = {};
     this.vertices = {};
+    this.robber = {};
 
     let directions = [
       { q: 1, r: 0 },
@@ -49,6 +50,7 @@ class Board {
       let q = coord[0];
       let r = coord[1];
 
+      if (resources[index] === "desert") this.robber = { q: q, r: r };
       let num = resources[index] === "desert" ? 0 : numbers.pop();
       this.tiles[q] = this.tiles[q] || {};
 

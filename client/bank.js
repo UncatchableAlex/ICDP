@@ -1,4 +1,5 @@
 /**
+ *
  * Encompasses the default Catan bank with
  * all resources and development cards along
  * with all the functions needed to ensure the
@@ -18,12 +19,12 @@ class Bank {
   }
 
   can_draw_devi() {
-    return developmentCards.length > 0;
+    return this.developmentCards.length > 0;
   }
 
   draw_devi() {
-    if (this.canSellDevelopmentCard()) {
-      return developmentCards.shift();
+    if (this.can_draw_devi()) {
+      return this.developmentCards.shift();
     }
     return "Failed to draw development card from cards";
   }
@@ -33,7 +34,7 @@ class Bank {
   }
 
   draw(type, amount) {
-    if (this.can_draw(type, amount)){
+    if (this.can_draw(type, amount)) {
       this.resources[type] -= amount;
       return true;
     }
