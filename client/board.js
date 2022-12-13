@@ -1,19 +1,33 @@
 class Board {
     static #TILE_COORDINATES = [
-        [0, -2], [-1, -1], [-2, 0], [-2, 1], [-2, 2],
-        [-1, 2], [0, 2], [1, 1], [2, 0], [2, -1],
-        [2, -2], [1, -2], [0, -1], [-1, 0], [-1, 1],
-        [0, 1], [1, 0], [1, -1], [0, 0]
+        [0, -2],
+        [-1, -1],
+        [-2, 0],
+        [-2, 1],
+        [-2, 2],
+        [-1, 2],
+        [0, 2],
+        [1, 1],
+        [2, 0],
+        [2, -1],
+        [2, -2],
+        [1, -2],
+        [0, -1],
+        [-1, 0],
+        [-1, 1],
+        [0, 1],
+        [1, 0],
+        [1, -1],
+        [0, 0],
     ];
     static #TILE_NUMBERS = [
-        11, 3, 6, 5, 4, 9, 10, 8, 4,
-        11, 12, 9, 10, 8, 3, 6, 2, 5
+        11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5,
     ];
 
     /**
-     * 
+     *
      * @constructor
-     * @param {string} resources 
+     * @param {string} resources
      */
     constructor(resources) {
         this.offsetX = canvas.width / 2;
@@ -21,14 +35,15 @@ class Board {
         this.tiles = {};
         this.edges = {};
         this.vertices = {};
+        this.robber = {};
 
         let directions = [
             { q: 1, r: 0 },
-            { q: 1, r: - 1 },
-            { q: 0, r: - 1 },
-            { q: - 1, r: 0 },
-            { q: - 1, r: 1 },
-            { q: 0, r: 1 }
+            { q: 1, r: -1 },
+            { q: 0, r: -1 },
+            { q: -1, r: 0 },
+            { q: -1, r: 1 },
+            { q: 0, r: 1 },
         ];
         let numbers = Board.#TILE_NUMBERS.splice(0);
         Board.#TILE_COORDINATES.forEach((coord, index) => {
@@ -40,22 +55,29 @@ class Board {
             this.tiles[q] = this.tiles[q] || {};
 
             let pos = Utils.hexToPixel(q, r);
-            this.tiles[q][r] = new Hex(pos.x + this.offsetX, pos.y + this.offsetY, resources[index], num);
+            this.tiles[q][r] = new Hex(
+                pos.x + this.offsetX,
+                pos.y + this.offsetY,
+                resources[index],
+                num
+            );
             for (let k = 0; k < 6; k++) {
                 // initialize and link vertices with hexes
                 let id = {
                     q: 3 * q + directions[k].q + directions[(k + 1) % 6].q,
-                    r: 3 * r + directions[k].r + directions[(k + 1) % 6].r
+                    r: 3 * r + directions[k].r + directions[(k + 1) % 6].r,
                 };
                 this.vertices[id.q] = this.vertices[id.q] || {};
-                this.vertices[id.q][id.r] = this.vertices[id.q][id.r] || new Vertex(id, this.offsetX, this.offsetY);
+                this.vertices[id.q][id.r] =
+                    this.vertices[id.q][id.r] ||
+                    new Vertex(id, this.offsetX, this.offsetY);
                 this.vertices[id.q][id.r].tiles.push(this.tiles[q][r]);
                 this.tiles[q][r].vertices[k] = this.vertices[id.q][id.r];
 
                 // initialize and link edges with hexes
                 id = {
                     q: 2 * q + directions[k].q,
-                    r: 2 * r + directions[k].r
+                    r: 2 * r + directions[k].r,
                 };
                 this.edges[id.q] = this.edges[id.q] || {};
                 this.edges[id.q][id.r] = this.edges[id.q][id.r] || new Edge();
@@ -67,10 +89,10 @@ class Board {
                 let e = this.tiles[q][r].edges[k];
                 let v2 = this.tiles[q][r].vertices[k];
                 let v1 = this.tiles[q][r].vertices[(k + 5) % 6];
-                if (!(e.vertices.includes(v1))) e.vertices.push(v1);
-                if (!(e.vertices.includes(v2))) e.vertices.push(v2);
-                if (!(v1.edges.includes(e))) v1.edges.push(e);
-                if (!(v2.edges.includes(e))) v2.edges.push(e);
+                if (!e.vertices.includes(v1)) e.vertices.push(v1);
+                if (!e.vertices.includes(v2)) e.vertices.push(v2);
+                if (!v1.edges.includes(e)) v1.edges.push(e);
+                if (!v2.edges.includes(e)) v2.edges.push(e);
             }
         });
     }
@@ -121,7 +143,7 @@ class Board {
     }
 
     can_add_road(x, y, playerId) {
-        console.log("Id: ",playerId)
+        console.log("Id: ", playerId)
         let pos = Utils.pixelToHex(x - this.offsetX, y - this.offsetY);
         pos.q = Math.round(pos.q * 2);
         pos.r = Math.round(pos.r * 2);
