@@ -66,7 +66,7 @@ class Bank {
   get_state() {
     let output = {
       resources: {},
-      developmentCards: this.developmentCards.splice(0)
+      developmentCards: this.developmentCards.splice(0),
     };
     for (let r in this.resources) {
       output.resources[r] = this.resources[r];

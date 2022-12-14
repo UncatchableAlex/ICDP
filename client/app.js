@@ -4,15 +4,14 @@ const ctx = canvas.getContext("2d");
 var board;
 var game;
 
+// Counter to allow player to select cards from the card bar
+var cardsToSelect = 10;
+
 socket.on("roll", (number) => {
   game.currentRoll = number;
   game.hasRolled = true;
   game.payout();
-  updateResources();
-});
-
-socket.on("pass turn", () => {
-  game.playerPassGame();
+  updateUI();
 });
 
 // Update initial resources
@@ -27,24 +26,19 @@ canvas.addEventListener("drop", (event) => {
     if (game.turn < game.playerCount) {
       playerId = game.turn;
     } else {
-      playerId = game.playerCount - game.turn % game.playerCount - 1;
+      playerId = game.playerCount - (game.turn % game.playerCount) - 1;
     }
   } else {
-    playerId =  game.turn % game.playerCount;
+    playerId = game.turn % game.playerCount;
   }
   let type = event.dataTransfer.getData("text/plain");
-  let hex = board[`can_add_${type}`](
-    event.offsetX,
-    event.offsetY,
-   playerId
-  );
+  let hex = board[`can_add_${type}`](event.offsetX, event.offsetY, playerId);
   if (hex) {
     let res = game.build(type, hex);
     console.log(res);
     if (res) {
       board.draw_board();
-      updateResources();
-      updateVPS();
+      updateUI();
     }
   }
 });
@@ -66,26 +60,22 @@ button.addEventListener("click", () => {
 // work in progress for playing development cards
 button = document.getElementById("playCard");
 button.addEventListener("click", () => {
+  // Make sure it's the players turn
+  if (!game.currentPlayer) {
+    return;
+  }
   let select = document.getElementById("devCardSelect");
-  updateDevCardSelect();
-  updateVPS();
+  let card = select.value.charAt(0).toUpperCase() + select.value.slice(1);
+  alert("Playing a " + card + " card");
+  this.game[`play${card}`]();
+  this.game.player.developmentCards[card];
+  updateUI();
 });
 
 button = document.getElementById("buyDevelopmentCard");
 button.addEventListener("click", () => {
-  console.log("Here");
   game.draw_devi();
-  updateDevCardSelect();
-  updateResources();
-  updateVPS();
-});
-
-
-button = document.getElementById("buyDevelopmentCard");
-button.addEventListener("click", () => {
-  game.draw_devi();
-  updateDevCardSelect();
-  updateResources();
+  updateUI();
 });
 
 function updateResources() {
@@ -118,7 +108,48 @@ function updateDevCardSelect() {
   document.getElementById("devCardSelect").replaceWith(selectList);
 }
 
+// Allow players to pick a resource
+let cardSelectRow = document.getElementById("cardSelectRow");
+let buttons = cardSelectRow.querySelectorAll("button");
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
+    // Make sure the person making the button press is the current player
+    if (!game.currentPlayer) {
+      return;
+    }
+    // Check if the card can be drawn
+    if (game.bank.draw(button.value, 1)) {
+      alert("You drew one " + button.value);
+      game.player.resources[button.value]++;
+      this.cardsToSelect--;
+      if (this.cardsToSelect <= 0) {
+        enableChooseCard(true);
+      }
+    } else {
+      alert(
+        "Sorry the there are not enough resources in the bank to draw 1" +
+          button.value
+      );
+    }
+    updateUI();
+  });
+});
+
+function enableChooseCard(state) {
+  let cardSelectRow = document.getElementById("cardSelectRow");
+  let buttons = cardSelectRow.querySelectorAll("button");
+  buttons.forEach((button) => {
+    button.disabled = state;
+  });
+}
+
 function updateVPS() {
   vps = document.getElementById("vpCounter");
   vps.innerHTML = game.player.getVPS();
+}
+
+function updateUI() {
+  updateDevCardSelect();
+  updateResources();
+  updateVPS();
 }

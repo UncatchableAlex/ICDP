@@ -32,20 +32,26 @@ class Game {
   }
 
   roll() {
-    if (this.turn >= 2 * this.playerCount && this.currentPlayer && !this.hasRolled) {
-      socket.emit("roll", this.currentRoll)
+    if (
+      this.turn >= 2 * this.playerCount &&
+      this.currentPlayer &&
+      !this.hasRolled
+    ) {
+      socket.emit("roll", this.currentRoll);
       return true;
     }
     return false;
   }
 
   payout() {
-    this.board.forEach("tiles",(q,r,hex) => {
+    this.board.forEach("tiles", (q, r, hex) => {
       if (hex.number === this.currentRoll && !hex.robber) {
         for (let v of hex.vertices) {
-          if (v.structure !== undefined && v.playerId === this.player.playerId) {
-            if (v.structure === "settie")
-              game.player.resources[hex.resource]++;
+          if (
+            v.structure !== undefined &&
+            v.playerId === this.player.playerId
+          ) {
+            if (v.structure === "settie") game.player.resources[hex.resource]++;
             else if (v.structure === "city")
               game.player.resources[hex.resource] += 2;
           }
@@ -74,7 +80,7 @@ class Game {
     if (this.currentPlayer && this.player[`can_build_${type}`]()) {
       this.player[`build_${type}`]();
       this.bank[`reclaim_${type}`]();
-      hex.type = type
+      hex.type = type;
       socket.emit("build", hex);
       return true;
     }
@@ -97,11 +103,23 @@ class Game {
     player.resources[resource] += totalResources;
   }
 
-  playYearOfPlenty(player, resource1, resource2) {
-    if (player.canPlayYearOfPlenty()) {
-      player.resources[resource1]++;
-      player.resources[resource2]++;
-    }
+  // Make it so the player can choose two cards. Also enable selector
+  playYearOfPlenty() {
+    cardsToSelect = 2;
+    enableChooseCard(false);
+    this.player.developmentCards.yearOfPlenty--;
+    this.player.developmentCardsPlayed.yearOfPlenty++;
+    alert("Please choose two free resources from the select buttons below");
+  }
+
+  // TODO Currently no checks if player indeed places the roads
+  // also the bank gets cards back which is bad
+  playRoadBuilding() {
+    this.player.resources.wood += 2;
+    this.player.resources.brick += 2;
+    alert("Please place your two free roads");
+    this.player.developmentCards.roadBuilding--;
+    this.player.developmentCardsPlayed.roadBuilding++;
   }
 
   playKnight(player, location) {}
