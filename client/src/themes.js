@@ -7,21 +7,24 @@ import {DarkModeOutlined, LightModeOutlined} from "@mui/icons-material";
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 console.log(ColorModeContext)
 
-const lightTheme = createTheme( {
-            palette: {
-                mode: 'light',
-                primary: {
-                    main: '#ff6ea4',
-                },
-                secondary: {
-                    main: '#3f51b5',
-                },
-                error: {
-                    main: 'rgb(255,0,0)'
-                },
-            }
+const lightTheme = createTheme({
+        palette: {
+            mode: 'light',
+            primary: {
+                main: '#ff6ea4',
+            },
+            secondary: {
+                main: '#3f51b5',
+            },
+            contrast: {
+                main: '#82ff6e',
+            },
+            error: {
+                main: 'rgb(255,0,0)'
+            },
         }
-    );
+    }
+);
 
 
 const darkTheme = createTheme({
@@ -39,7 +42,7 @@ const darkTheme = createTheme({
             },
             text: {
                 primary: '#f9f9f9',
-                secondary: 'rgba(255,255,253,0.7)',
+                secondary: '#FD9F00FF',
             },
         }
     }
