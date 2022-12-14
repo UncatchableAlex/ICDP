@@ -16,8 +16,8 @@ class Player {
 
     this.developmentCards = {
       knight: 0,
-      roadBuilding: 1,
-      yearOfPlenty: 1,
+      roadBuilding: 0,
+      yearOfPlenty: 0,
       monopoly: 0,
       victoryPoint: 0,
     };
@@ -134,5 +134,18 @@ class Player {
 
   receive_devi(developmentCard) {
     this.developmentCards[developmentCard]++;
+  }
+
+  emptyHand() {
+    let sum = 0;
+    sum += this.resources.wood;
+    sum += this.resources.brick;
+    sum += this.resources.sheep;
+    sum += this.resources.wheat;
+    sum += this.resources.ore;
+    if (sum === 0) {
+      return true;
+    }
+    return false;
   }
 }

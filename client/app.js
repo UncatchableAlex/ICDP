@@ -8,6 +8,7 @@ var game;
 var cardsToSelect = 10;
 
 socket.on("roll", (number) => {
+  console.log("payout");
   game.currentRoll = number;
   game.hasRolled = true;
   game.payout();
@@ -22,6 +23,7 @@ canvas.addEventListener("dragover", (event) => {
 
 canvas.addEventListener("drop", (event) => {
   let playerId;
+  // In the initial building phase
   if (game.turn < 2 * game.playerCount) {
     if (game.turn < game.playerCount) {
       playerId = game.turn;
@@ -54,7 +56,17 @@ button.addEventListener("click", () => {
 
 button = document.getElementById("pass");
 button.addEventListener("click", () => {
-  game.passTurn();
+  // Still in the building phase
+  if (game.turn >= 2 * game.playerCount && game.hasRolled) {
+    game.passTurn();
+    return;
+  }
+  if (game.player.emptyHand()) {
+    game.passTurn();
+    return;
+  } else {
+    alert("Please place a settlement and road before ending your turn");
+  }
 });
 
 // work in progress for playing development cards

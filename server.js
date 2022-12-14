@@ -25,24 +25,27 @@ io.on("connection", async (socket) => {
   console.log("new user");
   queue.enqueue(socket);
   if (queue.getLength() >= 2) {
+    // TODO Get new room id based on the highest recorded database id
+    //let roomId = `room ${await PopulateDatabase.newGameId()}`;
     let roomId = `room ${rooms++}`;
-    console.log(`created ${roomId}`);
 
+    console.log(`created ${roomId}`);
     let tiles = Utils.get_rand_tile_seq();
     let cards = Utils.get_rand_devi_seq();
+    let players = [];
 
     for (let i = 0; i < 2; i++) {
       let s = queue.dequeue();
       s.join(roomId);
+
+      // Set up events
       s.on("roll", () => {
         let num =
           2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
         io.to(roomId).emit("roll", num);
       });
       // Need to grab cards from other players
-      s.on("monopoly", () =>{
-
-      })
+      s.on("monopoly", () => {});
       s.on("pass turn", () => {
         io.to(roomId).emit("pass turn");
       });
@@ -56,6 +59,15 @@ io.on("connection", async (socket) => {
       });
     }
     io.to(roomId).emit("pass turn");
+    // Make call to database to store game
+    // await PopulateDatabase.addGame(
+    //   roomId,
+    //   players[0],
+    //   players[1],
+    //   players[2],
+    //   players[3],
+    //   get_tile_seq_sql(tiles)
+    // );
   }
 });
 

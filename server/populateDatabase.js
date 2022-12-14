@@ -84,14 +84,14 @@ class PopulateDatabase {
     await client.end();
   }
 
-  //Game //TODO will need to go on the server end as players don't have access to each other
-  static async game(player0, player1, player2, player3, board) {
+  //Game
+  static async addGame(gameId, player0, player1, player2, player3, board) {
     let client = new Client(auth.dbCreds);
     await client.connect();
     await client.query(
       `INSERT INTO "game" ("gameid", "starttime", "player0", "player1", "player2", "player3", "board")
       VALUES ($1,$2,$3,$4,$5,%6,$7)`,
-      [await newGameId(), player0, player1, player2, player3, board]
+      [gameId, player0, player1, player2, player3, board]
     );
     await client.end();
   }
