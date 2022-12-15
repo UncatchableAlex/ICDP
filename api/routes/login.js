@@ -24,32 +24,32 @@ const badUser = {
 const badPw = {
     "accepted" : false,
     "message" : "incorrect password"
-}
+};
 const allGood = {
     "accepted" : true,
     "message" : "all good"
-}
+};
 
 const badNewUser = {
     "accepted" : false,
     "message" : "one or more fields unacceptable"
-}
+};
 
 const userAlreadyExists = {
     "accepted" : false,
     "message" : "username already taken"
-}
+};
 
 const emailAlreadyExists = {
     "accepted" : false,
     "message" : "email already has account registered"
-}
+};
 
 function testEmail(email) {
-    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
 }
 
-client.connect()
+client.connect();
 router.post('/', async (req, res, next) => {
     console.log("stored myCookie: ")
     console.log(cookieParser.signedCookie(req.signedCookies.myCookie));
@@ -70,11 +70,10 @@ router.post('/', async (req, res, next) => {
     }
     const hashed = pbkdf2.pbkdf2Sync(password, rows[0].salt, 310000, 64, "sha512").toString("hex");
     if (rows[0].pword === hashed) {
-        const now = new Date()
+        console.log("were here")
+        const now = new Date();
         res.cookie("myCookie", username+":"+now, {signed:true, maxAge:1000*60*60*8});
-        const queryText = "INSERT INTO cookie(username, issued) VALUES($1,$2) ON CONFLICT (username) DO UPDATE SET " +
-            "issued = EXCLUDED.issued"
-        const {rows} = await client.query(queryText, [username, now])
+        console.log("now were here");
         res.send(allGood);
         return res;
     }
@@ -121,12 +120,10 @@ router.post('/new-user', async (req, res, next) => {
     const salt = crypto.randomBytes(32).toString("hex")
     const hashed = pbkdf2.pbkdf2Sync(password, salt, 310000, 64, "sha512").toString("hex")
     const addUserText = "INSERT INTO account(username, email, pword, salt) VALUES ($1,$2,$3,$4)";
-    console.log("inserted new user")
-    try {
-        const userAdded = await client.query(addUserText, [username, email, hashed, salt]);
-    }catch(err){
-        console.log(err);
-    }
+    console.log("inserted new user");
+    const userAdded = await client.query(addUserText, [username, email, hashed, salt]);
+    const now = new Date();
+    res.cookie("myCookie", username+":"+now, {signed:true, maxAge:1000*60*60*8});
     res.send(allGood);
     return res;
 });
