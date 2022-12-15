@@ -155,7 +155,7 @@ export function LoginPage() {
                 const mes = res.data.message;
                 console.log(mes)
                 if (res.data.accepted) {
-                    //  window.location.replace("/")
+                    window.location.replace("http://localhost:9000")
                 } else {
                     console.log(mes);
                     if (mes === "user does not exist") {
@@ -233,7 +233,7 @@ export function LoginPage() {
                     unStateSet({helperText: res.data.message, val: unState.val, color: "error"});
                 }
             } else {
-                hideEmailSet(true);
+                window.location.replace("http://localhost:9000")
             }
         });
     }
