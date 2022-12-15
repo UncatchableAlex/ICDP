@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./stylesheets/style.css">
+</head>
+
+<body>
+    <script>
+        function dragstart_handler(event) {
+            event.dataTransfer.setData("text/plain", event.target.id);
+        }
+    </script>
+    <div>
+        <canvas id="canvas" width="500" height="500"></canvas>
+
+        <table class="outerTable">
+            <tr>
+                <td>
+                    <table>
+                        <tr><td align="center"><button id="roll">roll</button></td>
+                        <tr><td align="center"><button id="pass">end turn</button></td></tr>
+                    </table>
+                </td>
+                <td>
+                    <table class = "innerTable">
+                        <tr>
+                            <td>Wood</td>
+                            <td>Brick</td>
+                            <td>Sheep</td>
+                            <td>Wheat</td>
+                            <td>Ore</td>
+                        </tr>
+                        <tr id>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                            <td id = "resources">0</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="innerTable">
+                        <tr>
+                            <td><p id="settie" draggable="true" ondragstart="dragstart_handler(event)">settie</p></td>
+                            <td> <p id="road" draggable="true" ondragstart="dragstart_handler(event)">road</p></td>
+                            <td><p id="city" draggable="true" ondragstart="dragstart_handler(event)">city</p></td>
+                            
+                        </tr>
+                    </table>
+                </td>    
+                    
+                    <td>
+                        <table>
+                            <th>
+                                Victory Points 
+                            </th>
+                            <tr>
+                                <td id = "vpCounter", style=" text-align: center">
+                                    0
+                                </td>
+                                
+                            </tr>
+                        </table>
+                    </td>
+            </tr>
+        </table>
+
+
+
+        
+        
+        <table>
+            <tr>
+                <td>Knight</td>
+                <td>Road Building</td>
+                <td>Year of Plenty</td>
+                <td>Monopoly</td>
+                <td>Victory Point</td>
+            </tr>
+            <tr>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+                <td id = devCards>0</td>
+            </tr>
+        </table>
+        <table id = "devCardTable">
+            <tr>
+                <td> <label id="devCard">Development Cards:</label></td>
+                <td><select name="Development Card Select" id="devCardSelect"></select></td>
+                <td><button id ="playCard" value="Play Card">Play Card</button></td>
+                <td><button id = "buyDevelopmentCard">Buy Development Card</button></td>
+            </tr>
+        </table>
+    </table>
+    <table id = cardSelect>
+        <tr id = cardSelectRow>
+            <td>Card Selection:</td>
+            <td><button value = "wood" disabled>Wood</button></td>
+            <td><button value = "brick" disabled>Brick</button></td>
+            <td><button value = "sheep" disabled>Sheep</button></td>
+            <td><button value = "wheat" disabled>Wheat</button></td>
+            <td><button value = "ore" disabled>Ore</button></td>
+        </tr>
+    </table>
+        
+    </div>
+    <script src="./javascripts/utils.js"></script>
+    <script src="./javascripts/edge.js"></script>
+    <script src="./javascripts/vertex.js"></script>
+    <script src="./javascripts/hex.js"></script>
+    <script src="./javascripts/board.js"></script>
+    <script src="./javascripts/player.js"></script>
+    <script src="./javascripts/bank.js"></script>
+    <script src="./javascripts/game.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./javascripts/socket.js"></script>
+    <script src="./javascripts/app.js"></script>
+</body>
+
+</html>

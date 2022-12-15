@@ -1,3 +1,11 @@
+.innerTable, th, td {
+  border: 1px solid black;
+
+}
+
+.outerTable, th, tr{
+  border:0px solid transparent;
+}
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;

@@ -1,0 +1,151 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('api:server');
+var http = require('http');
+const {Utils} = require("../util/utils");
+const {Queue} = require("../util/queue")
+const queue = new Queue()
+var rooms = 0;
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '9000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+
+var io = require('socket.io')(server);
+app.set("io", io);
+io.on("connection", async (socket) => {
+  // enter queue
+  console.log("new user");
+  queue.enqueue(socket);
+  if (queue.getLength() >= 2) {
+    // TODO Get new room id based on the highest recorded database id
+    //let roomId = `room ${await PopulateDatabase.newGameId()}`;
+    let roomId = `room ${rooms++}`;
+
+    console.log(`created ${roomId}`);
+    let tiles = Utils.get_rand_tile_seq();
+    let cards = Utils.get_rand_devi_seq();
+    let players = [];
+
+    for (let i = 0; i < 2; i++) {
+      let s = queue.dequeue();
+      s.join(roomId);
+
+      // Set up events
+      s.on("roll", () => {
+        let num =
+            2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+        io.to(roomId).emit("roll", num);
+      });
+      // Need to grab cards from other players
+      s.on("monopoly", () => {
+      });
+      s.on("pass turn", () => {
+        io.to(roomId).emit("pass turn");
+      });
+      s.on("build", (info) => {
+        io.to(roomId).emit("build", info);
+      });
+      io.to(s.id).emit("join game", {
+        tiles: tiles,
+        cards: cards,
+        playerId: i,
+      });
+    }
+    io.to(roomId).emit("pass turn");
+    // Make call to database to store game
+    // await PopulateDatabase.addGame(
+    //   roomId,
+    //   players[0],
+    //   players[1],
+    //   players[2],
+    //   players[3],
+    //   get_tile_seq_sql(tiles)
+    // );
+  }
+});
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+console.log("listening on port " + port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
