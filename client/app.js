@@ -5,16 +5,7 @@ var board;
 var game;
 
 // Counter to allow player to select cards from the card bar
-var cardsToSelect = 10;
-
-socket.on("roll", (number) => {
-  console.log("payout");
-  game.currentRoll = number;
-  game.hasRolled = true;
-  game.payout();
-  updateUI();
-});
-
+var cardsToSelect = 0;
 // Update initial resources
 
 canvas.addEventListener("dragover", (event) => {

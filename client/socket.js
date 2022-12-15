@@ -57,3 +57,11 @@ socket.on("build", (info) => {
     game.bank[`reclaim_${info.type}`]();
     board.draw_board();
 });
+
+socket.on("YearOfPlenty", (info) =>{
+    
+});
+
+socket.on("roadBuilding", (info) =>{
+
+});
