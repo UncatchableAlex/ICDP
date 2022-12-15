@@ -12,7 +12,6 @@ var rooms = 0;
 
 router.get("/", (req, res) => {
   res.sendFile("../public/index.html");
-  connect(req);
 });
 
 

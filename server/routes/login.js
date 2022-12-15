@@ -70,10 +70,8 @@ router.post('/', async (req, res, next) => {
     }
     const hashed = pbkdf2.pbkdf2Sync(password, rows[0].salt, 310000, 64, "sha512").toString("hex");
     if (rows[0].pword === hashed) {
-        console.log("were here")
         const now = new Date();
         res.cookie("myCookie", username+":"+now, {signed:true, maxAge:1000*60*60*8});
-        console.log("now were here");
         res.send(allGood);
         return res;
     }
