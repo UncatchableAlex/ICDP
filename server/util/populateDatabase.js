@@ -91,7 +91,7 @@ class PopulateDatabase {
     await client.query(
       `INSERT INTO "game" ("gameid", "starttime", "player0", "player1", "player2", "player3", "board")
       VALUES ($1,$2,$3,$4,$5,%6,$7)`,
-      [gameId, player0, player1, player2, player3, board]
+      [gameId, "CURRENT_TIMESTAMP", player0, player1, player2, player3, board]
     );
     await client.end();
   }
@@ -109,19 +109,20 @@ class PopulateDatabase {
   }
 
   //devies_played
-  static async addDeviePlayed() {
+  static async addDeviePlayed(gameId, turnnum, player, devie) {
     let client = new Client(auth.dbCreds);
     await client.connect();
+    let deviepg = `(${devie})::devie`;
     await client.query(
-      `INSERT INTO ("gameid","turnnum","player", "devie")
+      `INSERT INTO devies_played ("gameid","turnnum","player", "devie")
     VALUES ($1, $2, $3, $4)`,
-      []
+      [gameId, turnnum, player, deviepg]
     );
     await client.end();
   }
 
   //City
-  static async addCity() {
+  static async add_city(gameId, turn, hex) {
     let client = new Client(auth.dbCreds);
     await client.connect();
     await client.query(
@@ -133,7 +134,7 @@ class PopulateDatabase {
   }
 
   //road
-  static async addRoad() {
+  static async add_road(gameId, turn, hex) {
     let client = new Client(auth.dbCreds);
     await client.connect();
     await client.query(
@@ -145,13 +146,13 @@ class PopulateDatabase {
   }
 
   //settie
-  static async addSettie() {
+  static async add_settie(gameId, turn, hex) {
     let client = new Client(auth.dbCreds);
     await client.connect();
     await client.query(
       `INSERT INTO "settie" ("gameid", "turnnum", "settiebuilt") 
     VALUES ($1, $2, $3)`,
-      []
+      [gameId, turn] // QR coordinates form hex
     );
     await client.end();
   }

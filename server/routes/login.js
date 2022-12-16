@@ -14,7 +14,6 @@ const client = new Client(auth.dbCreds);
 const cookieParser = require("cookie-parser")
 const router = Router()
 router.get('/',(req, res) => {
-    res.send("hello world")
 });
 
 const badUser = {

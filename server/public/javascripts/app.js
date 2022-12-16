@@ -125,8 +125,12 @@ buttons.forEach((button) => {
       alert("You drew one " + button.value);
       game.player.resources[button.value]++;
       this.cardsToSelect--;
+      //this.cardsSelected.push(button.value);
       if (this.cardsToSelect <= 0) {
         enableChooseCard(true);
+
+        // Make call to server to push changes
+        game.playedDevie("yearOfPlenty");
       }
     } else {
       alert(

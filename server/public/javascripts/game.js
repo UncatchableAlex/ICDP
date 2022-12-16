@@ -81,10 +81,45 @@ class Game {
       this.player[`build_${type}`]();
       this.bank[`reclaim_${type}`]();
       hex.type = type;
-      socket.emit("build", hex);
+      socket.emit("build", this.gameId, this.turn, hex);
       return true;
     }
     return false;
+  }
+
+  // Make it so the player can choose two cards. Also enable selector
+  playYearOfPlenty() {
+    cardsToSelect = 2;
+    enableChooseCard(false);
+    this.player.developmentCards.yearOfPlenty--;
+    this.player.developmentCardsPlayed.yearOfPlenty++;
+    alert("Please choose two free resources from the select buttons below");
+    playedDevie("yearOfPlenty");
+  }
+
+  playedDevie(type) {
+    socket.emit(
+      "played devie",
+      this.gameId,
+      this.turn,
+      this.player.playerName,
+      type
+    );
+  }
+
+  // TODO Currently no checks if player indeed places the roads
+  // also the bank gets cards back which is bad
+  playRoadBuilding() {
+    this.player.resources.wood += 2;
+    this.player.resources.brick += 2;
+    alert("Please place your two free roads");
+    this.player.developmentCards.roadBuilding--;
+    this.player.developmentCardsPlayed.roadBuilding++;
+    playedDevie("roadBuilding");
+  }
+
+  playKnight(player, location) {
+    this.playedDevie("knight");
   }
 
   playMonopoly(player, resource) {
@@ -101,26 +136,26 @@ class Game {
     }
     // Give player all of the stolen resource
     player.resources[resource] += totalResources;
+    this.playedDevie("monopoly");
   }
 
-  // Make it so the player can choose two cards. Also enable selector
-  playYearOfPlenty() {
-    cardsToSelect = 2;
-    enableChooseCard(false);
-    this.player.developmentCards.yearOfPlenty--;
-    this.player.developmentCardsPlayed.yearOfPlenty++;
-    alert("Please choose two free resources from the select buttons below");
+  storeHand() {
+    socket.emit(
+      "hand",
+      this.gameId,
+      this.turn,
+      this.player.playerName,
+      this.player.resources.wood,
+      this.player.resources.wheat,
+      this.player.resources.sheep,
+      this.player.resources.brick,
+      this.player.resources.ore,
+      this.player.developmentCards.victoryPoint,
+      this.player.developmentCards.monopoly,
+      this.player.developmentCards.knight,
+      this.player.developmentCards.yearOfPlenty,
+      this.player.developmentCards.roadBuilding,
+      this.player.victoryPoints
+    );
   }
-
-  // TODO Currently no checks if player indeed places the roads
-  // also the bank gets cards back which is bad
-  playRoadBuilding() {
-    this.player.resources.wood += 2;
-    this.player.resources.brick += 2;
-    alert("Please place your two free roads");
-    this.player.developmentCards.roadBuilding--;
-    this.player.developmentCardsPlayed.roadBuilding++;
-  }
-
-  playKnight(player, location) {}
 }
