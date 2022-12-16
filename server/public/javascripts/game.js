@@ -22,6 +22,11 @@ class Game {
   // Passes the
   passTurn() {
     if (this.currentPlayer && this.turn < 2 * this.playerCount) {
+      // Game win condition
+      if (this.player.getVPS() >= 10) {
+        socket.emit("Player Wins", this.player.playerName);
+        return;
+      }
       if (this.currentPlayer) socket.emit("pass turn");
       return true;
     } else if (this.currentPlayer && this.hasRolled) {
@@ -73,6 +78,7 @@ class Game {
       this.player.receive_devi(this.bank.draw_devi());
       // Give resources back to bank
       this.bank.reclaim_devi();
+      socket.emit("bought devie", this.player.playerId);
     }
   }
 
