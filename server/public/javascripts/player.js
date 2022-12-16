@@ -17,7 +17,7 @@ class Player {
     this.developmentCards = {
       knight: 0,
       roadBuilding: 0,
-      yearOfPlenty: 0,
+      yearOfPlenty: 1,
       monopoly: 0,
       victoryPoint: 0,
     };

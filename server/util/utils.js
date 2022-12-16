@@ -35,29 +35,42 @@ class Utils {
   }
 
   static get_tile_seq_sql(list) {
-    let sqlBoardString = [];
+    let sqlBoardString;
     list.forEach((string) => {
       switch (string) {
         case "wood":
-          sqlBoardString.push("L");
+          sqlBoardString += "L";
           return;
         case "brick":
-          sqlBoardString.push("B");
+          sqlBoardString += "B";
           return;
         case "sheep":
-          sqlBoardString.push("W");
+          sqlBoardString += "W";
           return;
         case "wheat":
-          sqlBoardString.push("G");
+          sqlBoardString += "G";
           return;
         case "ore":
-          sqlBoardString.push("O");
+          sqlBoardString += "O";
           return;
         case "desert":
-          sqlBoardString.push("D");
+          sqlBoardString += "D";
       }
     });
     return sqlBoardString;
+  }
+
+  static devie_convert(string) {
+    switch (string) {
+      case "yearOfPlenty":
+        return "YEAR_OF_PLENTY";
+      case "knight":
+        return "KNIGHT";
+      case "monopoly":
+        return "MONOPOLY";
+      case "roadBuilding":
+        return "ROAD_BUILDER";
+    }
   }
 
   static get_rand_devi_seq() {

@@ -24,3 +24,5 @@ yarn-error.log*
 
 #secrets
 creds.json
+
+icdp_create_tables.sql

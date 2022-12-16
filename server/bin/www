@@ -3,21 +3,25 @@
 /**
  * Module dependencies.
  */
-
-var app = require('../app');
-var debug = require('debug')('api:server');
-var http = require('http');
-const {Utils} = require("../util/utils");
-const {Queue} = require("../util/queue")
-const queue = new Queue()
+const auth = require("../creds.json");
+var cookie = require("cookie");
+const cookieParser = require("cookie-parser");
+var app = require("../app");
+var debug = require("debug")("api:server");
+var http = require("http");
+const { Utils } = require("../util/utils");
+const { Queue } = require("../util/queue");
+const { PopulateDatabase } = require("../util/populateDatabase.js");
+const { emit } = require("process");
+const queue = new Queue();
 var rooms = 0;
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '9000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "9000");
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -25,61 +29,164 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-
-var io = require('socket.io')(server);
+var io = require("socket.io")(server);
 app.set("io", io);
 io.on("connection", async (socket) => {
-  // enter queue
+  var cookies = cookie.parse(socket.handshake.headers.cookie);
+  var cookieAuthentication = cookieParser.signedCookie(
+    cookies.myCookie,
+    auth.cookieSignature
+  );
+
+  // Check to make sure cookie is valid
+  if (cookieAuthentication === false) {
+    alert("Sorry, inaccurate cookie credentials");
+    console.log("Inaccurate cookie credentials");
+    socket.disconnect();
+  }
+
+  // Check to ensure the cookie is no older than 8 hours (uses unix time)
+  if (
+    Math.abs(Date.parse(new Date()) - Date.parse(cookieAuthentication)) >=
+    28800000
+  ) {
+    alert("Sorry your cookie is expired");
+    console.log("Sorry your cookie is expired");
+    socket.disconnect();
+  }
+
   console.log("new user");
   queue.enqueue(socket);
   if (queue.getLength() >= 2) {
-    // TODO Get new room id based on the highest recorded database id
-    //let roomId = `room ${await PopulateDatabase.newGameId()}`;
-    let roomId = `room ${rooms++}`;
+    // Get new gameId based on the databases current highest gameId
+    let roomId = `room ${await PopulateDatabase.newGameId()}`;
 
     console.log(`created ${roomId}`);
+    // Generate static game elements
     let tiles = Utils.get_rand_tile_seq();
     let cards = Utils.get_rand_devi_seq();
-    let players = [];
+    let players = []; // Reset list of players
 
     for (let i = 0; i < 2; i++) {
       let s = queue.dequeue();
       s.join(roomId);
 
+      // Get username from cookie (also check authentication again)
+      var cookies = cookie.parse(socket.handshake.headers.cookie);
+      var cookieAuthentication = cookieParser.signedCookie(
+        cookies.myCookie,
+        auth.cookieSignature
+      );
+
+      players.push(cookieAuthentication.split(":")[0]);
+
       // Set up events
       s.on("roll", () => {
         let num =
-            2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+          2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
         io.to(roomId).emit("roll", num);
       });
-      // Need to grab cards from other players
-      s.on("monopoly", () => {
-      });
+
+      // TODO Need to grab cards from other players
+      s.on("monopoly", () => {});
+
       s.on("pass turn", () => {
         io.to(roomId).emit("pass turn");
       });
-      s.on("build", (info) => {
-        io.to(roomId).emit("build", info);
+
+      s.on("build", async (gameId, turn, hex) => {
+        io.to(roomId).emit("build", hex);
+        // Make call to database to add buildings:
+        try {
+          await PopulateDatabase[`add_${hex.type}`](gameId, turn, hex);
+        } catch (error) {
+          console.log("Attempted to add building to database: \n" + error);
+        }
       });
+
+      // Update the database with a year of plenty card that has been played:
+      s.on("played devie", async (gameId, turn, playerName, devie) => {
+        try {
+          await PopulateDatabase.addDeviePlayed(
+            gameId,
+            turn,
+            playerName,
+            Utils.devie_convert(devie)
+          );
+        } catch (error) {
+          console.log("Attempt to add development card to database\n" + error);
+        }
+      });
+
+      s.on("bought devie", () => {
+        io.to(roomId).emit("bought devie");
+      });
+
       io.to(s.id).emit("join game", {
         tiles: tiles,
         cards: cards,
         playerId: i,
       });
+
+      // Update hand in database (Must be a better way to package up the info than this)
+      s.on(
+        "hand",
+        async (
+          gameId,
+          turn,
+          playerName,
+          wood,
+          wheat,
+          sheep,
+          brick,
+          ore,
+          victoryPoint,
+          monopoly,
+          knight,
+          yearOfPlenty,
+          roadBuilding,
+          victoryPoints
+        ) => {
+          try {
+            await PopulateDatabase.addPlayerHand(
+              gameId,
+              turn,
+              playerName,
+              wood,
+              wheat,
+              sheep,
+              brick,
+              ore,
+              victoryPoint,
+              monopoly,
+              knight,
+              yearOfPlenty,
+              roadBuilding,
+              victoryPoints
+            );
+          } catch (error) {
+            console.log("Attempted to add hand to database \n" + error);
+          }
+        }
+      );
     }
     io.to(roomId).emit("pass turn");
-    // Make call to database to store game
-    // await PopulateDatabase.addGame(
-    //   roomId,
-    //   players[0],
-    //   players[1],
-    //   players[2],
-    //   players[3],
-    //   get_tile_seq_sql(tiles)
-    // );
+
+    // Make call to database to store game after game is deployed
+    try {
+      await PopulateDatabase.addGame(
+        roomId,
+        players[0],
+        players[1],
+        players[2],
+        players[3],
+        get_tile_seq_sql(tiles)
+      );
+    } catch (error) {
+      console.log("Attempted to add game to database");
+    }
   }
 });
-
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -87,8 +194,8 @@ io.on("connection", async (socket) => {
 
 server.listen(port);
 console.log("listening on port " + port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -115,22 +222,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -144,8 +249,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }
