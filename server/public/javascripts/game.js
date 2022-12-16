@@ -25,7 +25,7 @@ class Game {
       if (this.currentPlayer) socket.emit("pass turn");
       return true;
     } else if (this.currentPlayer && this.hasRolled) {
-      socket.emit("pass turn");
+      socket.emit("pass turn", this.turn);
       return true;
     }
     return false;
@@ -37,7 +37,7 @@ class Game {
       this.currentPlayer &&
       !this.hasRolled
     ) {
-      socket.emit("roll", this.currentRoll);
+      socket.emit("roll", this.turn);
       return true;
     }
     return false;

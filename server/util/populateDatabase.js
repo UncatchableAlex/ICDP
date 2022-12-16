@@ -5,46 +5,24 @@ const { Client } = require("pg");
 const auth = require("../creds.json");
 
 class PopulateDatabase {
-  static async addTurn() {
-    let client = new Client(auth.dbCreds);
+
+
+  static async addTurn(gameId, turnnum, player) {
+    const  client = new Client(auth.dbCreds);
     await client.connect();
-    client
-      .query(
-        `INSERT INTO "turn" ("gameId", "turnnum", "player", "roll", "robber", "largestarmy", "largestarmyplayer", "longestroad", longestroadplayer)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        []
-      )
-      .then((dbres) => {
-        console.log(dbres.rows);
-      })
-      .catch((e) => console.error(e.stack));
+    const queryText = "INSERT INTO turn(gameid, turnnum, player) VALUES ($1, $2, $3)";
+    const {rows} = await client.query(queryText, [gameId, turnnum, player]);
+    await client.end();
   }
 
-  // TODO REMOVE
-  static async addTurnTest() {
-    let client = new Client(auth.dbCreds);
+  static async addRoll(gameId, turnnum, roll) {
+    const  client = new Client(auth.dbCreds);
     await client.connect();
-    await client
-      .query(
-        `INSERT INTO "turn" ("gameid", "turnnum", "player", "roll", "robber", "largestarmy", "largestarmyplayer", "longestroad", longestroadplayer) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [
-          -1,
-          1,
-          "DJ Alex",
-          5,
-          (0, 0), // robber always at 0,0 for now
-          0, // Longest road when claimed by no one = 0
-          "NA",
-          0, // Largest Army when claimed by no one = 0
-          "NA",
-        ]
-      )
-      .then((dbres) => {
-        console.log(dbres.rows);
-      })
-      .catch((e) => console.error(e.stack));
+    const queryText = "INSERT INTO turn(gameid, turnnum, player) VALUES ($1, $2, $3)";
+    const {rows} = await client.query(queryText, [gameId, turnnum, roll]);
+    await client.end();
   }
+
 
   // Players Hand
   static async addPlayerHand() {
@@ -88,23 +66,12 @@ class PopulateDatabase {
   static async addGame(gameId, player0, player1, player2, player3, board) {
     let client = new Client(auth.dbCreds);
     await client.connect();
-    await client.query(
-      `INSERT INTO "game" ("gameid", "starttime", "player0", "player1", "player2", "player3", "board")
-      VALUES ($1,$2,$3,$4,$5,%6,$7)`,
-      [gameId, "CURRENT_TIMESTAMP", player0, player1, player2, player3, board]
-    );
-    await client.end();
-  }
-
-  //Port
-  static async addPort() {
-    let client = new Client(auth.dbCreds);
-    await client.connect();
-    await client.query(
-      `INSERT INTO ("gameid","vert0","ver1", "ptype")
-    VALUES ($1, $2, $3, $4)`,
-      []
-    );
+    const now = new Date();
+    console.log("board: ")
+    console.log(board);
+    const queryText = 'INSERT INTO game(gameid, player0, player1, player2, player3, board, starttime) VALUES ' +
+        '($1,$2,$3,$4,$5,$6,$7)';
+    await client.query(queryText, [gameId, player0, player1, player2, player3, board, now]);
     await client.end();
   }
 
@@ -121,51 +88,16 @@ class PopulateDatabase {
     await client.end();
   }
 
-  //City
-  static async add_city(gameId, turn, hex) {
+  // settie
+  static async add_structure(gameId, turn, hex) {
+    console.log("trying to build a " + hex + " in game " + gameId + " on turn " + turn);
     let client = new Client(auth.dbCreds);
     await client.connect();
-    await client.query(
-      `INSERT INTO ("gameid","turnnum","citybuilt")
-    VALUES ($1, $2, $3)`,
-      []
-    );
-    await client.end();
-  }
-
-  //road
-  static async add_road(gameId, turn, hex) {
-    let client = new Client(auth.dbCreds);
-    await client.connect();
-    await client.query(
-      `INSERT INTO ("gameid","turnnum","raodbuilt")
-    VALUES ($1, $2, $3)`,
-      []
-    );
-    await client.end();
-  }
-
-  //settie
-  static async add_settie(gameId, turn, hex) {
-    let client = new Client(auth.dbCreds);
-    await client.connect();
-    await client.query(
-      `INSERT INTO "settie" ("gameid", "turnnum", "settiebuilt") 
-    VALUES ($1, $2, $3)`,
-      [gameId, turn] // QR coordinates form hex
-    );
-    await client.end();
-  }
-
-  //trade
-  static async addTrade() {
-    let client = new Client(auth.dbCreds);
-    await client.connect();
-    await client.query(
-      `INSERT INTO "trade" ("gameid", "turnnum", "fromplayer", "toplayer", "wood", "grain", "wool", "brick", "ore") 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      []
-    );
+    if (!["city", "settie", "road"].includes(hex.type)) {
+      throw "hex is not of the correct type. Type: " + hex.type;
+    }
+    const queryText = "INSERT INTO " + hex.type + "(gameid, turnnum, " + hex.type + "built) VALUES ($1, $2, ($3, $4))"
+    await client.query(queryText, [gameId, turn, hex.q, hex.r]);
     await client.end();
   }
 
@@ -173,14 +105,9 @@ class PopulateDatabase {
   static async newGameId() {
     let client = new Client(auth.dbCreds);
     await client.connect();
-    let temp = await client
-      .query(`select MAX(gameid) from game`)
-      .then((res) => {
-        return res.rows[0].max;
-      })
-      .catch((e) => console.error(e.stack));
+    let {rows} = await client.query(`select MAX(gameid) from game`);
     await client.end();
-    return temp + 1;
+    return rows[0].max === null ? 0 : parseInt(rows[0].max) + 1;
   }
 }
 exports.PopulateDatabase = PopulateDatabase;

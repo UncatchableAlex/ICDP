@@ -35,7 +35,7 @@ class Utils {
   }
 
   static get_tile_seq_sql(list) {
-    let sqlBoardString;
+    let sqlBoardString = "";
     list.forEach((string) => {
       switch (string) {
         case "wood":

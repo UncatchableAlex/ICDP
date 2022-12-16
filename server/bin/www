@@ -15,6 +15,7 @@ const { PopulateDatabase } = require("../util/populateDatabase.js");
 const { emit } = require("process");
 const queue = new Queue();
 var rooms = 0;
+const playersInAGame = 4;
 
 /**
  * Get port from environment and store in Express.
@@ -34,8 +35,8 @@ app.set("io", io);
 io.on("connection", async (socket) => {
   var cookies = cookie.parse(socket.handshake.headers.cookie);
   var cookieAuthentication = cookieParser.signedCookie(
-    cookies.myCookie,
-    auth.cookieSignature
+      cookies.myCookie,
+      auth.cookieSignature
   );
 
   // Check to make sure cookie is valid
@@ -47,8 +48,8 @@ io.on("connection", async (socket) => {
 
   // Check to ensure the cookie is no older than 8 hours (uses unix time)
   if (
-    Math.abs(Date.parse(new Date()) - Date.parse(cookieAuthentication)) >=
-    28800000
+      Math.abs(Date.parse(new Date()) - Date.parse(cookieAuthentication)) >=
+      28800000
   ) {
     alert("Sorry your cookie is expired");
     console.log("Sorry your cookie is expired");
@@ -57,48 +58,58 @@ io.on("connection", async (socket) => {
 
   console.log("new user");
   queue.enqueue(socket);
-  if (queue.getLength() >= 2) {
+  if (queue.getLength() >= playersInAGame) {
     // Get new gameId based on the databases current highest gameId
-    let roomId = `room ${await PopulateDatabase.newGameId()}`;
+    let roomId = await PopulateDatabase.newGameId();
 
     console.log(`created ${roomId}`);
     // Generate static game elements
     let tiles = Utils.get_rand_tile_seq();
     let cards = Utils.get_rand_devi_seq();
     let players = []; // Reset list of players
+    let sockets = []
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < playersInAGame; i++) {
       let s = queue.dequeue();
       s.join(roomId);
 
       // Get username from cookie (also check authentication again)
       var cookies = cookie.parse(socket.handshake.headers.cookie);
       var cookieAuthentication = cookieParser.signedCookie(
-        cookies.myCookie,
-        auth.cookieSignature
+          cookies.myCookie,
+          auth.cookieSignature
       );
 
       players.push(cookieAuthentication.split(":")[0]);
-
+      sockets.push(s);
+    }
+    for (let i = 0; i < playersInAGame; i++) {
+      const s = sockets[i]
       // Set up events
-      s.on("roll", () => {
+      s.on("roll", async (turn) => {
         let num =
-          2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+            2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
         io.to(roomId).emit("roll", num);
+        await PopulateDatabase.addRoll(roomId, turn, num);
       });
 
       // TODO Need to grab cards from other players
       s.on("monopoly", () => {});
 
-      s.on("pass turn", () => {
+      s.on("pass turn", async (turn) => {
+        console.log("were passing the turn");
         io.to(roomId).emit("pass turn");
+        const nextPlayer = players % (turn + 1);
+        console.log("it's the " + (turn + 1) + "th turn");
+        await PopulateDatabase.addTurn(roomId, turn, nextPlayer);
+        console.log("we added the new turn")
       });
 
       s.on("build", async (gameId, turn, hex) => {
         io.to(roomId).emit("build", hex);
         // Make call to database to add buildings:
         try {
-          await PopulateDatabase[`add_${hex.type}`](gameId, turn, hex);
+          await PopulateDatabase.add_structure(roomId, turn, hex);
         } catch (error) {
           console.log("Attempted to add building to database: \n" + error);
         }
@@ -108,10 +119,10 @@ io.on("connection", async (socket) => {
       s.on("played devie", async (gameId, turn, playerName, devie) => {
         try {
           await PopulateDatabase.addDeviePlayed(
-            gameId,
-            turn,
-            playerName,
-            Utils.devie_convert(devie)
+              gameId,
+              turn,
+              playerName,
+              Utils.devie_convert(devie)
           );
         } catch (error) {
           console.log("Attempt to add development card to database\n" + error);
@@ -126,29 +137,13 @@ io.on("connection", async (socket) => {
         tiles: tiles,
         cards: cards,
         playerId: i,
+        roomId: roomId
       });
 
       // Update hand in database (Must be a better way to package up the info than this)
       s.on(
-        "hand",
-        async (
-          gameId,
-          turn,
-          playerName,
-          wood,
-          wheat,
-          sheep,
-          brick,
-          ore,
-          victoryPoint,
-          monopoly,
-          knight,
-          yearOfPlenty,
-          roadBuilding,
-          victoryPoints
-        ) => {
-          try {
-            await PopulateDatabase.addPlayerHand(
+          "hand",
+          async (
               gameId,
               turn,
               playerName,
@@ -163,29 +158,43 @@ io.on("connection", async (socket) => {
               yearOfPlenty,
               roadBuilding,
               victoryPoints
-            );
-          } catch (error) {
-            console.log("Attempted to add hand to database \n" + error);
+          ) => {
+            try {
+              await PopulateDatabase.addPlayerHand(
+                  gameId,
+                  turn,
+                  playerName,
+                  wood,
+                  wheat,
+                  sheep,
+                  brick,
+                  ore,
+                  victoryPoint,
+                  monopoly,
+                  knight,
+                  yearOfPlenty,
+                  roadBuilding,
+                  victoryPoints
+              );
+            } catch (error) {
+              console.log("Attempted to add hand to database \n" + error);
+            }
           }
-        }
       );
     }
     io.to(roomId).emit("pass turn");
 
     // Make call to database to store game after game is deployed
-    try {
-      await PopulateDatabase.addGame(
+    await PopulateDatabase.addGame(
         roomId,
         players[0],
         players[1],
         players[2],
         players[3],
-        get_tile_seq_sql(tiles)
-      );
-    } catch (error) {
-      console.log("Attempted to add game to database");
-    }
-  }
+        Utils.get_tile_seq_sql(tiles)
+    );
+    await PopulateDatabase.addTurn(roomId, 0, players[0]);
+}
 });
 
 /**

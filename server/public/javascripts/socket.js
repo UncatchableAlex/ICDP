@@ -1,9 +1,10 @@
+const {PopulateDatabase} = require("../../util/populateDatabase");
 const socket = io();
 
 socket.on("join game", (info) => {
   console.log(`joining game as player ${info.playerId}`);
   board = new Board(info.tiles);
-  game = new Game(0, this.board, info.cards, info.playerId);
+  game = new Game(info.gameId, this.board, info.cards, info.playerId);
   board.draw_board();
   updateDevCardSelect();
   updateResources();
@@ -16,7 +17,7 @@ socket.on("roll", (number) => {
   game.payout();
 });
 
-socket.on("pass turn", () => {
+socket.on("pass turn", async () => {
   game.turn++;
   if (game.turn < 2 * game.playerCount) {
     if (game.turn < game.playerCount) {
@@ -44,7 +45,10 @@ socket.on("pass turn", () => {
       game.player.playerId === game.turn % game.playerCount ? true : false;
     game.hasRolled = false;
   }
-  if (game.currentPlayer) alert("It's your turn");
+  if (game.currentPlayer) {
+    alert("It's your turn")
+    socket.emit()
+  }
 });
 
 socket.on("build", (info) => {
