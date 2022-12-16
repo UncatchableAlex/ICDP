@@ -118,14 +118,10 @@ io.on("connection", async (socket) => {
         }
       });
 
-      s.on("bought devie", () => {
-        io.to(roomId).emit("bought devie");
-      });
-
-      io.to(s.id).emit("join game", {
-        tiles: tiles,
-        cards: cards,
-        playerId: i,
+      // Purchased development card (update other players hands)
+      s.on("bought devie", (playerId) => {
+        console.log("Buy devie server receaved")
+        io.to(roomId).emit("bought devie", playerId);
       });
 
       // Update hand in database (Must be a better way to package up the info than this)
@@ -169,6 +165,18 @@ io.on("connection", async (socket) => {
           }
         }
       );
+
+      s.on("Player Wins", (playerName) => {
+        console.log("Server : Emitting player win to entire loby");
+        io.to(roomId).emit("Player Wins", playerName);
+      });
+
+      // Emit initial development cards, board tile locations and playerID
+      io.to(s.id).emit("join game", {
+        tiles: tiles,
+        cards: cards,
+        playerId: i,
+      });
     }
     io.to(roomId).emit("pass turn");
 

@@ -73,6 +73,14 @@ socket.on("player disconnected", () => {
 });
 
 // If another player buys a devie pop that card off every players card stack
-socket.on("bought devie", () => {
-  game.bank.draw_devi();
+socket.on("bought devie", (playerId) => {
+  console.log("da player " + playerId);
+  if (game.player.playerId !== playerId) {
+    game.bank.draw_devi();
+  }
+});
+
+socket.on("Player Wins", (playerName) => {
+  console.log("Client: receiving player win from");
+  alert(playerName + " has won!!!");
 });

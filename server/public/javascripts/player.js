@@ -4,7 +4,7 @@ class Player {
   constructor(playerId, playerName) {
     this.playerId = playerId;
     this.playerName = playerName;
-    this.victoryPoints = 0;
+    this.victoryPoints = 10;
 
     this.resources = {
       wood: 0,
@@ -17,7 +17,7 @@ class Player {
     this.developmentCards = {
       knight: 0,
       roadBuilding: 0,
-      yearOfPlenty: 1,
+      yearOfPlenty: 0,
       monopoly: 0,
       victoryPoint: 0,
     };
