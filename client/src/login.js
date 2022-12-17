@@ -184,7 +184,7 @@ export function LoginPage() {
           const mes = res.data.message;
           console.log(mes);
           if (res.data.accepted) {
-            window.location.replace("http://localhost:9000");
+            window.location.replace(window.location.href + "game/");
           } else {
             console.log(mes);
             if (mes === "user does not exist") {
@@ -308,7 +308,7 @@ export function LoginPage() {
             });
           }
         } else {
-          window.location.replace("http://localhost:9000");
+          window.location.replace(window.location.href + "game/");
         }
       });
   };

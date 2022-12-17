@@ -14,6 +14,7 @@ const client = new Client(auth.dbCreds);
 const cookieParser = require("cookie-parser")
 const router = Router()
 router.get('/',(req, res) => {
+    res.sendFile("../public/views/index.html")
 });
 
 const badUser = {
@@ -71,7 +72,7 @@ router.post('/', async (req, res, next) => {
     if (rows[0].pword === hashed) {
         const now = new Date();
         res.cookie("myCookie", username+":"+now, {signed:true, maxAge:1000*60*60*8});
-        res.send(allGood);
+        res.redirect('/game');
         return res;
     }
     console.log("hashed: " + hashed);
@@ -121,7 +122,7 @@ router.post('/new-user', async (req, res, next) => {
     const userAdded = await client.query(addUserText, [username, email, hashed, salt]);
     const now = new Date();
     res.cookie("myCookie", username+":"+now, {signed:true, maxAge:1000*60*60*8});
-    res.send(allGood);
+    res.redirect('/game')
     return res;
 });
 module.exports = router;

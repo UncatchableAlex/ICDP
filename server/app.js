@@ -1,21 +1,23 @@
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const app = express();
-const indexRouter = require('./routes/index');
 const loginRouter = require('./routes/login');
 const auth = require("./creds.json");
-
-
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(auth.cookieSignature));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', indexRouter);
-app.use('/login', loginRouter);
-
+console.log(__dirname)
+app.use("/", express.static(__dirname + '/public/views/'));
+app.use("/game", express.static(__dirname + '/public/'));
+app.use("/login", loginRouter)
+app.get('/', function (req,res) {
+    res.sendFile(__dirname + "/public/views/");
+});
+app.get("/game", (req, res) => {
+    res.sendFile(__dirname + "/public/index.html")
+})
 
 module.exports = app;

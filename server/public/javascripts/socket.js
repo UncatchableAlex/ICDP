@@ -1,4 +1,3 @@
-const {PopulateDatabase} = require("../../util/populateDatabase");
 const socket = io();
 
 socket.on("join game", (info) => {

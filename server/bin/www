@@ -138,6 +138,7 @@ io.on("connection", async (socket) => {
         cards: cards,
         playerId: i,
         roomId: roomId
+      });
 
       // Update hand in database (Must be a better way to package up the info than this)
       s.on(
